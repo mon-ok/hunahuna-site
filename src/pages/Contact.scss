@@ -1,0 +1,53 @@
+.contact {
+  display: grid;
+  gap: 2.5rem;
+  @include up('md') { grid-template-columns: 1fr 1fr; }
+}
+
+.contact__list {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  li { display: flex; gap: 0.6rem; align-items: baseline; }
+}
+
+.contact__hours { color: $color-muted; }
+
+.contact__socials {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: flex;
+  gap: 1rem;
+}
+
+.contact__map {
+  border-radius: $radius-lg;
+  overflow: hidden;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-sm;
+  iframe {
+    width: 100%;
+    height: 280px;
+    border: 0;
+    display: block;
+  }
+}
+
+.contact__form-wrap {
+  background: $color-sand;
+  border-radius: $radius-lg;
+  padding: 1.5rem;
+  @include up('sm') { padding: 2rem; }
+}
+.contact__sent {
+  background: rgba($color-success, 0.12);
+  color: $color-success;
+  border-radius: $radius-md;
+  padding: 0.75rem 1rem;
+  font-size: 0.92rem;
+}
+.contact__form .field__control { background: $color-light; }

@@ -1,0 +1,52 @@
+.page-header {
+  position: relative;
+  isolation: isolate;
+  color: $color-light;
+  text-align: center;
+  overflow: hidden;
+  // Clear the fixed nav, then add generous editorial breathing room.
+  padding-top: calc(var(--nav-h) + clamp(3.5rem, 8vw, 6.5rem));
+  padding-bottom: clamp(3.5rem, 8vw, 6.5rem);
+}
+
+// Layered sunset wash with a soft vignette so white type stays crisp.
+.page-header__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: $color-sunset,
+    radial-gradient(circle at 70% 15%, rgba($color-light, 0.22), transparent 55%);
+  background-blend-mode: overlay;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba($color-dark, 0.18), rgba($color-dark, 0.32));
+  }
+}
+
+.page-header__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page-header__eyebrow {
+  color: rgba($color-light, 0.95);
+}
+
+.page-header__title {
+  color: $color-light;
+  margin: 0;
+  text-shadow: 0 2px 24px rgba($color-dark, 0.25);
+}
+
+.page-header__lead {
+  color: rgba($color-light, 0.95);
+  max-width: 54ch;
+  margin: 1rem auto 0;
+  font-size: 1.15rem;
+  font-weight: 300;
+}

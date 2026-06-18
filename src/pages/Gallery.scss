@@ -1,0 +1,21 @@
+.gallery-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+.gallery-filter {
+  border: 1px solid $color-border;
+  background: $color-light;
+  padding: 0.5rem 1.1rem;
+  border-radius: $radius-pill;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: $color-muted;
+  text-transform: capitalize;
+  &.is-active {
+    background: $color-sunset;
+    color: $color-light;
+    border-color: transparent;
+  }
+}

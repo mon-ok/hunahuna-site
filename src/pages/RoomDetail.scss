@@ -1,0 +1,61 @@
+.room-detail__back {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.room-detail {
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+  @include up('md') {
+    grid-template-columns: 1.6fr 1fr;
+  }
+}
+
+.room-detail__title {
+  margin-top: 0;
+}
+
+.room-detail__meta {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: $color-muted;
+}
+
+.room-detail__rates {
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.room-detail__rates-title {
+  font-size: 1.15rem;
+  margin: 0 0 0.75rem;
+}
+.rate-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed $color-border;
+  small {
+    color: $color-muted;
+    font-weight: 400;
+  }
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+.room-detail__rates-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.82rem;
+  color: $color-muted;
+}
+
+.room-detail__desc {
+  margin-top: 2.5rem;
+  max-width: 70ch;
+}

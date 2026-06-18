@@ -1,0 +1,100 @@
+// Scroll-triggered split reveal. The image fills the section, then recedes to
+// one half while the copy fades into the other. Tokens: $split-* in
+// _variables.scss.
+.split-reveal {
+  overflow: hidden;
+  // Drop the inherited .section vertical padding so the media runs flush to the
+  // section's top and bottom edges (the split fills the full height on desktop).
+  padding-block: 0;
+}
+
+.split-reveal__inner {
+  position: relative;
+}
+
+// ---- Mobile (stacked: image on top, text below) -----------------------------
+.split-reveal__media {
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  border-radius: $radius-lg;
+
+  .img,
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.split-reveal__text {
+  // Symmetric padding keeps the stacked mobile copy off the section edges now
+  // that the section itself has no vertical padding.
+  padding: 2rem 1.5rem;
+  @include up('sm') {
+    padding-inline: 2.25rem;
+  }
+  opacity: 0;
+  transform: translateY($resources-offset);
+  transition:
+    opacity $split-duration $ease-out-expo $split-text-delay,
+    transform $split-duration $ease-out-expo $split-text-delay;
+}
+
+.split-reveal.is-visible .split-reveal__text {
+  opacity: 1;
+  transform: none;
+}
+
+// ---- Desktop (the split) ----------------------------------------------------
+@include up('md') {
+  .split-reveal__inner {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+  }
+
+  // Text occupies one half; the image (full width to start) covers it until the
+  // section scrolls into view.
+  .split-reveal__text {
+    width: 50%;
+    padding: 0;
+  }
+
+  // Image fills the whole row, then animates down to a half on .is-visible.
+  .split-reveal__media {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    aspect-ratio: auto;
+    transition: width $split-duration $ease-out-expo;
+  }
+
+  .split-reveal.is-visible .split-reveal__media {
+    width: 50%;
+  }
+
+  // --- Image on the LEFT (default): text sits in the right half --------------
+  .split-reveal--media-left {
+    .split-reveal__media {
+      left: 0;
+    }
+    .split-reveal__text {
+      margin-left: auto; // push to the right half
+      padding-left: clamp(2rem, 5vw, 4.5rem);
+      padding-right: clamp(2.25rem, 6vw, 6rem);
+    }
+  }
+
+  // --- Image on the RIGHT: text sits in the left half ------------------------
+  .split-reveal--media-right {
+    .split-reveal__media {
+      right: 0;
+    }
+    .split-reveal__text {
+      margin-right: auto; // keep in the left half
+      padding-right: clamp(2rem, 5vw, 4.5rem);
+      padding-left: clamp(2.25rem, 6vw, 6rem);
+    }
+  }
+}

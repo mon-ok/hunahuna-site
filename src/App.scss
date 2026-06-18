@@ -1,0 +1,15 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.app__main {
+  flex: 1;
+}
+
+// The navbar is fixed, so pages whose first block isn't a full-bleed hero or
+// page-header (e.g. room detail, 404) need to clear it. The hero/page-header
+// bake their own top clearance in, so they're excluded by tag.
+.app__main > div > .section:first-child {
+  padding-top: calc(var(--nav-h) + clamp(2.5rem, 6vw, 5rem));
+}

@@ -1,0 +1,87 @@
+// Ocean palette — deep sea to lagoon, evoking the coastal setting.
+$color-primary: #1167b1; // ocean blue (primary fills, links, buttons)
+$color-secondary: #4cc3e0; // lagoon cyan (highlights, sun-arc equivalent)
+$color-accent: #0b3d91; // deep navy — accent only, never large fills
+$color-dark: #12243a; // navy-charcoal for text
+$color-light: #ffffff;
+$color-sand: #eef5fb; // pale sea mist (soft section fills)
+
+// Derived / support tones
+$color-primary-dark: #0e5694; // ~8% darker than primary — for text on pale fills
+$color-text: $color-dark;
+$color-muted: #5a6b7d; // blue-grey
+$color-border: #d6e3ef;
+$color-sand-deep: #e1edf7; // deeper sea mist
+$color-success: #2e7d32;
+$color-error: #d64545; // standalone red so error states stay legible against blue
+
+$color-sunset: linear-gradient(135deg, #4cc3e0 0%, #1167b1 60%, #0b3d91 100%);
+$color-sunset-soft: linear-gradient(135deg, rgba(#4cc3e0, 0.92) 0%, rgba(#1167b1, 0.92) 60%, rgba(#0b3d91, 0.92) 100%);
+
+// Typography — high-contrast serif headings paired with a clean geometric
+// sans for UI/body. System fallbacks keep first paint sane.
+$font-heading: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+// High-contrast serif retained for select display moments (hero, brand mark).
+$font-display: 'Cormorant Garamond', 'Georgia', 'Times New Roman', serif;
+$font-body: 'Jost', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+
+// Tracking used on small-caps eyebrows / nav / buttons.
+$tracking-wide: 0.22em;
+
+// Radius & shadow — restrained, editorial: near-square corners, airy shadows.
+$radius-sm: 4px;
+$radius-md: 6px;
+$radius-lg: 10px;
+$radius-pill: 999px;
+
+$shadow-sm: 0 4px 18px rgba(43, 43, 43, 0.06);
+$shadow-md: 0 14px 40px rgba(43, 43, 43, 0.1);
+$shadow-lg: 0 30px 70px rgba(43, 43, 43, 0.16);
+
+// Layout — wider stage + generous gutter for an airier, editorial feel.
+$max-width: 1280px;
+$gutter: 1.5rem;
+
+// Breakpoints (mobile-first)
+$bp-sm: 640px;
+$bp-md: 900px;
+$bp-lg: 1200px;
+
+// Z-index scale
+$z-nav: 100;
+$z-overlay: 500;
+$z-lightbox: 900;
+
+// ---- Motion tokens ----------------------------------------------------------
+// Shared easing + timings for the CSS scroll/hover animations (HeroIntro,
+// AboutReveal, Resources). Tune these to retune every effect at once. The
+// global `prefers-reduced-motion` rule in global.scss already neutralises all
+// of them when the OS requests reduced motion.
+$ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1); // decelerating; matches Motion.jsx EASE
+
+// 1 — Hero intro (background image zoom only; the eyebrow + title entrance is
+// driven by Framer Motion in HeroIntro.jsx).
+$hero-zoom-from: 1.4;          // starting scale of the hero image
+$hero-zoom-duration: 1.8s;     // image scale-down: 1.4 -> 1
+
+// 2 — About reveal (scroll-linked pan + text fade)
+$about-duration: 1s;           // text + image fade-in on enter
+$about-pan-scale: 1.3;         // image zoom that creates room to pan within the frame
+$about-pan-distance: 16%;      // total horizontal travel of the slow rightward pan
+
+// 2b — Split reveal (image fills the section, then recedes to one half on enter)
+$split-duration: 1.1s;         // image full-width -> half-width + text fade
+$split-text-delay: 0.25s;      // text waits a beat as the image recedes
+
+// 3 — Resources header + image stagger
+$resources-duration: 0.8s;
+$resources-stagger: 0.12s;     // gap between each of the three image fade-ins
+$resources-offset: 2rem;       // vertical rise distance for the fade-in
+
+// 4 — Resources hover accordion
+$accordion-duration: 0.85s;    // flex-grow expansion — slower & smoother
+$accordion-grow: 4;            // flex-grow of the hovered / focused item
+$accordion-shrink: 1;          // flex-grow of its siblings
+$accordion-zoom: 1.08;         // image scale on hover
+$accordion-reveal-duration: 0.7s; // description fade-in / button roll-up
+$accordion-reveal-delay: 0.16s;   // button trails the text for a staged feel

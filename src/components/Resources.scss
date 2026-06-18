@@ -1,0 +1,107 @@
+// Animations 3 + 4 — Resources section + hover accordion.
+// Tokens: $resources-* (stagger/fade) and $accordion-* (hover) in _variables.scss.
+
+// Soft sand fill — continues the page's alternating section rhythm so the
+// resources block reads as distinct from the white split-reveal above it.
+.resources {
+  background: $color-sand;
+}
+
+// Full-bleed section: the accordion row runs edge-to-edge, so the centered
+// header carries its own gutter (it has no .container wrapper).
+.resources__head {
+  padding-inline: 1.5rem;
+  @include up('sm') {
+    padding-inline: 2.25rem;
+  }
+}
+
+.resources__list {
+  list-style: none;
+  margin: 0;
+  // A bit of breathing room on the sides so the images aren't glued to the
+  // viewport edges, while the row still reads as wide/generous.
+  padding: 0 clamp(1.5rem, 4vw, 3rem);
+  display: flex;
+  flex-direction: column; // mobile: stacked
+  gap: 1rem;
+
+  @include up('md') {
+    flex-direction: row; // desktop: the accordion row
+    align-items: stretch;
+    height: clamp(360px, 48vw, 560px);
+  }
+}
+
+.resources__item {
+  display: flex; // let the card fill the item
+  flex: 1 1 0;
+  min-width: 0;
+
+  // Mobile: give each stacked card a sensible height.
+  min-height: 240px;
+
+  // The <li> is the actual flex child of the row, so the accordion resize
+  // happens here (the card inside just stretches to fill it).
+  transition: flex-grow $accordion-duration $ease-out-expo;
+}
+
+// ---- Animation 3: staggered fade-in (driven by .is-visible on the section) --
+.resources.is-visible .resource-card {
+  opacity: 1;
+  transform: none;
+}
+
+// ---- Animation 4: hover accordion (desktop / fine pointers only) ------------
+// Restricted to hover-capable pointers so touch devices keep every card open
+// and equally sized.
+@media (hover: hover) and (pointer: fine) {
+  @include up('md') {
+    // When the row is interacted with, every item shrinks to the base...
+    .resources__list:hover .resources__item,
+    .resources__list:focus-within .resources__item {
+      flex-grow: $accordion-shrink;
+    }
+
+    // ...and the hovered/focused one grows. flex-grow redistributes the space
+    // automatically, so this works for the left, middle or right card alike.
+    .resources__list .resources__item:hover,
+    .resources__list .resources__item:focus-within {
+      flex-grow: $accordion-grow;
+    }
+
+    // Zoom the active image in a touch.
+    .resource-card:hover .img,
+    .resource-card:focus-within .img,
+    .resource-card:hover img,
+    .resource-card:focus-within img {
+      transform: scale($accordion-zoom);
+    }
+
+    // Labels on the non-active items fade out while one is active.
+    .resources__list:hover .resources__item:not(:hover) .resource-card__label,
+    .resources__list:focus-within
+      .resources__item:not(:focus-within)
+      .resource-card__label {
+      opacity: 0;
+    }
+
+    // The active card reveals its description (fade) + Discover button (roll-up).
+    .resource-card:hover .resource-card__desc,
+    .resource-card:focus-within .resource-card__desc,
+    .resource-card:hover .resource-card__cta,
+    .resource-card:focus-within .resource-card__cta {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+// On touch / small screens there's no hover, so always show the reveal.
+@media not all and (hover: hover) {
+  .resource-card__desc,
+  .resource-card__cta {
+    opacity: 1;
+    transform: none;
+  }
+}

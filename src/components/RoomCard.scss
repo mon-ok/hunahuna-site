@@ -1,0 +1,82 @@
+.room-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.room-card__media {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  .img {
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+.room-card:hover .room-card__media .img {
+  transform: scale(1.05);
+}
+
+.room-card__rate {
+  position: absolute;
+  bottom: 0.85rem;
+  left: 0.85rem;
+  background: rgba($color-light, 0.94);
+  backdrop-filter: blur(4px);
+  border-radius: $radius-pill;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $color-muted;
+  box-shadow: $shadow-sm;
+}
+
+.room-card__body {
+  padding: 1.4rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  flex: 1;
+}
+
+.room-card__title {
+  margin: 0;
+  font-size: 1.6rem;
+  a {
+    color: $color-dark;
+    &:hover {
+      color: $color-primary;
+      text-decoration: none;
+    }
+  }
+}
+
+.room-card__meta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-size: 0.9rem;
+  color: $color-muted;
+}
+
+.room-card__desc {
+  margin: 0;
+  color: $color-muted;
+  font-size: 0.95rem;
+  @include line-clamp(3);
+}
+
+.room-card__actions {
+  margin-top: auto;
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  .btn {
+    flex: 1;
+    padding-inline: 1rem;
+    font-size: 0.92rem;
+  }
+}

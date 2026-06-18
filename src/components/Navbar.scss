@@ -1,0 +1,209 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-nav;
+  // Transparent overlay state (default, over the home hero).
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background 0.35s ease, border-color 0.35s ease,
+    box-shadow 0.35s ease, backdrop-filter 0.35s ease, transform 0.35s ease;
+
+  // Solid state — translucent sand with blur once scrolled / off-home.
+  &.is-solid {
+    background: rgba($color-light, 0.88);
+    backdrop-filter: blur(12px);
+    border-bottom-color: $color-border;
+    box-shadow: $shadow-sm;
+  }
+
+  // Home: a shade of blue at the very top (before it solidifies on scroll).
+  // The :not(.is-solid) link/brand rules already switch text to light, so this
+  // reads cleanly over the blue.
+  &.nav--home:not(.is-solid) {
+    background: rgba($color-primary, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom-color: rgba($color-light, 0.18);
+  }
+
+  // Hide-on-scroll-down (home): slide the bar up out of view.
+  &.is-hidden {
+    transform: translateY(-100%);
+  }
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: var(--nav-h);
+}
+
+.nav__brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+.nav__brandtext {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  font-family: $font-display;
+  font-weight: 500;
+  font-size: 1.7rem;
+  color: $color-light;
+  transition: color 0.35s ease;
+
+  small {
+    font-family: $font-body;
+    font-weight: 500;
+    font-size: 0.6rem;
+    letter-spacing: $tracking-wide;
+    text-transform: uppercase;
+    margin-top: 0.3rem;
+    color: rgba($color-light, 0.8);
+    transition: color 0.35s ease;
+  }
+}
+
+// In solid mode the wordmark switches to dark ink.
+.nav.is-solid .nav__brandtext {
+  color: $color-dark;
+  small {
+    color: $color-primary;
+  }
+}
+
+.nav__toggle {
+  border: none;
+  background: transparent;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  @include up('md') {
+    display: none;
+  }
+}
+.nav__bars,
+.nav__bars::before,
+.nav__bars::after {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: $color-light;
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+}
+.nav.is-solid .nav__bars,
+.nav.is-solid .nav__bars::before,
+.nav.is-solid .nav__bars::after {
+  background: $color-dark;
+}
+.nav__bars {
+  position: relative;
+}
+.nav__bars::before {
+  position: absolute;
+  top: -7px;
+}
+.nav__bars::after {
+  position: absolute;
+  top: 7px;
+}
+.nav__bars.is-open {
+  background: transparent;
+  &::before {
+    transform: translateY(7px) rotate(45deg);
+  }
+  &::after {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+}
+
+.nav__menu {
+  // Mobile: collapsible panel below the bar.
+  position: absolute;
+  inset: var(--nav-h) 0 auto;
+  background: rgba($color-light, 0.97);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid $color-border;
+  box-shadow: $shadow-md;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+
+  &.is-open {
+    max-height: 80vh;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  @include up('md') {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    background: transparent;
+    backdrop-filter: none;
+    border: none;
+    box-shadow: none;
+    ul {
+      flex-direction: row;
+      align-items: center;
+      padding: 0;
+      gap: 0.4rem;
+    }
+  }
+}
+
+.nav__link {
+  display: block;
+  padding: 0.7rem 0.9rem;
+  border-radius: $radius-sm;
+  color: $color-dark;
+  font-family: $font-body;
+  font-weight: 500;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+
+  &:hover {
+    text-decoration: none;
+    color: $color-primary;
+  }
+  &.is-active {
+    color: $color-primary;
+  }
+
+  // Desktop overlay (transparent bar): links are light until the bar solidifies.
+  @include up('md') {
+    .nav:not(.is-solid) & {
+      color: rgba($color-light, 0.92);
+      &:hover,
+      &.is-active {
+        color: $color-light;
+      }
+    }
+  }
+}
+
+.nav__cta {
+  margin-top: 0.6rem;
+  @include up('md') {
+    margin-top: 0;
+    margin-left: 0.6rem;
+    padding: 0.7rem 1.4rem;
+  }
+}

@@ -1,0 +1,11 @@
+.rooms-filters {
+  display: grid;
+  gap: 0 1rem;
+  margin-bottom: 2rem;
+  @include up('sm') {
+    grid-template-columns: repeat(2, minmax(160px, 220px));
+  }
+}
+.rooms-grid {
+  @include card-grid(300px);
+}

@@ -1,0 +1,109 @@
+// Loaded via `@use 'base'`, so Vite's additionalData does not reach this file —
+// import the tokens explicitly.
+@use 'variables' as *;
+@use 'mixins' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  // Height of the fixed navbar; pages use it to clear the overlay.
+  --nav-h: 76px;
+}
+
+body {
+  margin: 0;
+  font-family: $font-body;
+  font-weight: 300;
+  color: $color-text;
+  background: $color-light;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: $font-heading;
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  color: $color-dark;
+  margin: 0 0 0.4em;
+}
+
+// Bold blocky grotesque carries weight at large sizes; these scale gracefully.
+h1 {
+  font-size: clamp(2.6rem, 6vw, 4.6rem);
+  font-weight: 900;
+}
+h2 {
+  font-size: clamp(2rem, 4.4vw, 3.1rem);
+}
+h3 {
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: $color-primary-dark;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a:hover {
+  color: $color-accent;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  @include focus-ring;
+}
+
+// Skip link for keyboard users
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: $color-dark;
+  color: $color-light;
+  padding: 0.75rem 1rem;
+  border-radius: 0 0 $radius-sm 0;
+  z-index: $z-nav + 1;
+  &:focus {
+    left: 0;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,90 @@
+.booking-form {
+  background: $color-light;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: 1.5rem;
+  box-shadow: $shadow-sm;
+  @include up('sm') {
+    padding: 2rem;
+  }
+}
+
+.booking-form__notice {
+  background: rgba($color-secondary, 0.18);
+  border: 1px solid rgba($color-primary, 0.3);
+  border-radius: $radius-md;
+  padding: 0.85rem 1rem;
+  font-size: 0.92rem;
+  margin-bottom: 1.5rem;
+}
+
+.booking-form__group {
+  border: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  legend {
+    font-family: $font-heading;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.9rem;
+    padding: 0;
+  }
+}
+
+.booking-form__row {
+  display: grid;
+  gap: 0 1rem;
+  @include up('sm') {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.field__opt {
+  font-weight: 400;
+  color: $color-muted;
+  font-size: 0.85em;
+}
+
+.booking-form__status {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+  &--ok { color: $color-success; }
+  &--bad { color: $color-error; }
+  &--warn { color: $color-primary; }
+}
+
+.booking-form__summary {
+  background: $color-sand;
+  border-radius: $radius-md;
+  padding: 1.1rem 1.2rem;
+  margin-bottom: 1.25rem;
+}
+.booking-form__summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+}
+.booking-form__summary-total {
+  border-top: 1px dashed $color-border;
+  margin-top: 0.4rem;
+  padding-top: 0.6rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.booking-form__summary-note {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: $color-muted;
+}
+
+.booking-form__submit {
+  margin-top: 0.5rem;
+}
+
+.booking-form__fineprint {
+  margin: 0.9rem 0 0;
+  font-size: 0.82rem;
+  color: $color-muted;
+  text-align: center;
+}

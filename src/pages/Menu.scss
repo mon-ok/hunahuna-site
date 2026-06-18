@@ -1,0 +1,22 @@
+.menu-toggle {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  background: $color-sand;
+  border-radius: $radius-pill;
+  margin-bottom: 2rem;
+}
+.menu-toggle__btn {
+  border: none;
+  background: transparent;
+  padding: 0.6rem 1.3rem;
+  border-radius: $radius-pill;
+  font-weight: 700;
+  color: $color-muted;
+  transition: background 0.15s ease, color 0.15s ease;
+  &.is-active {
+    background: $color-light;
+    color: $color-primary;
+    box-shadow: $shadow-sm;
+  }
+}

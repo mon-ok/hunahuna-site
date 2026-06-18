@@ -1,0 +1,309 @@
+// variables + mixins are injected by Vite's additionalData; just pull in base.
+@use 'base';
+
+// ---- Shared layout helpers -------------------------------------------------
+.container {
+  @include container;
+}
+
+// Airy, editorial vertical rhythm.
+.section {
+  padding-block: clamp(4rem, 9vw, 8rem);
+}
+
+.section--sand {
+  background: $color-sand;
+}
+
+.section--tight {
+  padding-block: clamp(2.5rem, 5vw, 4rem);
+}
+
+.section__head {
+  text-align: center;
+  max-width: 660px;
+  margin: 0 auto clamp(2.5rem, 5vw, 3.75rem);
+
+  p {
+    color: $color-muted;
+    font-size: 1.15rem;
+    margin-top: 0.75rem;
+  }
+}
+
+.section__head--left {
+  text-align: left;
+  margin-inline: 0;
+}
+
+// Eyebrow: small-caps label — a hallmark of the editorial-resort look.
+.eyebrow {
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: $tracking-wide;
+  font-family: $font-body;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: $color-primary;
+  margin-bottom: 1rem;
+}
+
+// Oversized intro paragraph for editorial statements.
+.lead {
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  font-weight: 300;
+  line-height: 1.7;
+  color: $color-text;
+}
+
+// Thin decorative rule.
+.divider {
+  width: 64px;
+  height: 1px;
+  background: $color-border;
+  border: 0;
+  margin: 1.5rem 0;
+
+  .section__head:not(.section__head--left) & {
+    margin-inline: auto;
+  }
+}
+
+// ---- Editorial feature row (image + text split) ----------------------------
+.feature-row {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+  @include up('md') {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.feature-row__media {
+  position: relative;
+  overflow: hidden;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  aspect-ratio: 4 / 5;
+
+  img,
+  .img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.feature-row__body {
+  max-width: 30rem;
+}
+
+// Reversed rows place the media on the right (on desktop).
+.feature-row--reverse {
+  @include up('md') {
+    .feature-row__media {
+      order: 2;
+    }
+  }
+}
+
+// ---- Buttons ---------------------------------------------------------------
+// Refined, letter-spaced, near-square — reads as understated luxury.
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1rem 2rem;
+  border: 1px solid transparent;
+  border-radius: $radius-sm;
+  font-family: $font-body;
+  font-weight: 500;
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease,
+    color 0.25s ease, border-color 0.25s ease;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.btn--primary {
+  background: $color-sunset;
+  background-size: 140% 140%;
+  background-position: 0% 50%;
+  color: $color-light;
+  box-shadow: $shadow-sm;
+  &:hover {
+    box-shadow: $shadow-md;
+    background-position: 100% 50%;
+  }
+}
+
+.btn--outline {
+  background: transparent;
+  border-color: rgba($color-dark, 0.35);
+  color: $color-dark;
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+}
+
+.btn--ghost {
+  background: rgba($color-light, 0.1);
+  color: $color-light;
+  border-color: rgba($color-light, 0.6);
+  backdrop-filter: blur(4px);
+  &:hover {
+    background: rgba($color-light, 0.2);
+    border-color: $color-light;
+  }
+}
+
+// Text link with an underline that wipes in on hover.
+.btn--line {
+  padding: 0.3rem 0;
+  border-radius: 0;
+  background: transparent;
+  color: $color-dark;
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  &:hover {
+    transform: none;
+    color: $color-primary;
+    &::after {
+      transform: scaleX(1);
+    }
+  }
+}
+
+.btn--block {
+  width: 100%;
+}
+
+// ---- Badges & pills --------------------------------------------------------
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: $radius-pill;
+  font-family: $font-body;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: $color-sand-deep;
+  color: $color-dark;
+}
+
+.badge--accent {
+  background: rgba($color-accent, 0.12);
+  color: $color-accent;
+}
+
+.price {
+  font-family: $font-heading;
+  color: $color-accent;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+// ---- Cards -----------------------------------------------------------------
+.card {
+  background: $color-light;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-md;
+  }
+}
+
+// ---- Forms -----------------------------------------------------------------
+.field {
+  margin-bottom: 1.2rem;
+}
+.field__label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.45rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $color-muted;
+}
+.field__control {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid $color-border;
+  border-radius: $radius-sm;
+  font-size: 1rem;
+  font-family: inherit;
+  color: $color-text;
+  background: $color-light;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  &:focus {
+    border-color: $color-primary;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.15);
+  }
+}
+.field__error {
+  color: $color-error;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+.field__hint {
+  color: $color-muted;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
+// ---- States ----------------------------------------------------------------
+.state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: $color-muted;
+}
+.state--error {
+  color: $color-error;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

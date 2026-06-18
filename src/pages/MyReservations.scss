@@ -1,0 +1,32 @@
+.reservations {
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+  max-width: 900px;
+  margin-inline: auto;
+  @include up('md') { grid-template-columns: 1fr 1fr; }
+}
+.reservations__form,
+.reservations__result {
+  padding: 1.5rem;
+}
+.reservations__ref {
+  font-family: monospace;
+  color: $color-primary;
+  margin: 0.5rem 0 1rem;
+}
+.reservations__details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  dt { color: $color-muted; }
+  dd { margin: 0; text-align: right; font-weight: 600; }
+}
+.reservations__pay { text-transform: capitalize; }
+
+.res-status--pending { background: rgba($color-secondary, 0.25); color: $color-primary-dark; }
+.res-status--confirmed { background: rgba($color-success, 0.14); color: $color-success; }
+.res-status--cancelled { background: rgba($color-accent, 0.12); color: $color-accent; }
+.res-status--completed { background: $color-sand-deep; color: $color-dark; }
+.res-status--rescheduled { background: rgba($color-primary, 0.12); color: $color-primary; }

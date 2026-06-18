@@ -1,0 +1,11 @@
+.amenity-group {
+  margin-bottom: 3rem;
+}
+.amenity-group__head {
+  margin-bottom: 1.25rem;
+  h2 { margin-bottom: 0.2rem; }
+  p { color: $color-muted; margin: 0; }
+}
+.amenity-grid {
+  @include card-grid(280px);
+}

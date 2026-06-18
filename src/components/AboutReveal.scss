@@ -1,0 +1,87 @@
+// Animation 2 — About reveal.
+// The copy fades in on enter; the image slowly pans to the right, driven by the
+// section's scroll position (--pan, 0→1, set by useScrollProgress) so the motion
+// stays visible the whole time you're scrolling past. Tokens: $about-* in
+// _variables.scss.
+.about-reveal {
+  overflow: hidden;
+  // Soft sand fill — first step of the page's alternating section rhythm
+  // (dark hero → sand → white → sand), so each block reads as distinct.
+  background: $color-sand;
+}
+
+.about-reveal__inner {
+  position: relative;
+}
+
+// ---- Text -------------------------------------------------------------------
+// The eyebrow / heading / body copy each animate themselves (Framer Reveal +
+// RevealHeading in AboutReveal.jsx), so the block only handles layout + gutter.
+.about-reveal__text {
+  // Full-bleed section, so the text carries its own gutter. Matches the site's
+  // container padding.
+  padding-inline: 1.5rem;
+  @include up('sm') {
+    padding-inline: 2.25rem;
+  }
+}
+
+// ---- Media frame (clips the panning image) ----------------------------------
+.about-reveal__media {
+  overflow: hidden;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  margin-top: 2rem;
+  aspect-ratio: 16 / 10;
+  opacity: 0;
+  transition: opacity $about-duration $ease-out-expo;
+}
+
+// Oversized inner layer that actually moves. It's zoomed so its edges overflow
+// the frame, giving room to pan without exposing empty gaps. translateX maps
+// the 0→1 scroll progress onto a left→right drift (centred at the midpoint).
+.about-reveal__pan {
+  width: 100%;
+  height: 100%;
+  transform: scale($about-pan-scale)
+    translateX(calc((var(--pan, 0.5) - 0.5) * #{$about-pan-distance}));
+  will-change: transform;
+
+  .img,
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.about-reveal.is-visible {
+  .about-reveal__media {
+    opacity: 1;
+  }
+}
+
+// ---- Desktop split (text left, panning image fixed on the right half) -------
+@include up('md') {
+  .about-reveal__inner {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .about-reveal__text {
+    width: 50%;
+    padding-left: clamp(2.25rem, 6vw, 6rem);
+    padding-right: clamp(2rem, 5vw, 4.5rem);
+  }
+
+  .about-reveal__media {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    margin-top: 0;
+    aspect-ratio: auto;
+  }
+}

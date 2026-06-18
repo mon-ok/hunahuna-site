@@ -1,0 +1,53 @@
+.amenity-card {
+  padding: 1.3rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.amenity-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.amenity-card__name {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.amenity-card__type--free {
+  background: rgba($color-success, 0.12);
+  color: $color-success;
+}
+.amenity-card__type--paid {
+  background: rgba($color-primary, 0.12);
+  color: $color-primary;
+}
+.amenity-card__type--bookable {
+  background: rgba($color-secondary, 0.22);
+  color: $color-primary-dark;
+}
+
+.amenity-card__desc {
+  margin: 0;
+  color: $color-muted;
+}
+
+.amenity-card__meta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  font-size: 0.92rem;
+  color: $color-muted;
+}
+
+.amenity-card__cta {
+  margin-top: auto;
+  align-self: flex-start;
+}

@@ -1,0 +1,148 @@
+// Premium intro overlay. Durations come from the component props as the
+// --preloader-* custom properties; easing reuses $ease-out-expo.
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999; // above nav + lightbox
+  display: grid;
+  place-items: center;
+  background: $color-dark;
+  color: $color-light;
+  opacity: 1;
+  transition: opacity var(--preloader-fade, 800ms) ease;
+
+  // Soft lagoon glow for depth.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 50% 42%,
+      rgba($color-secondary, 0.22),
+      transparent 60%
+    );
+  }
+
+  &.is-leaving {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.preloader__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+// ---- Brand mark -------------------------------------------------------------
+.preloader__mark {
+  width: 84px;
+  height: 84px;
+  margin-bottom: 1.5rem;
+  overflow: visible;
+}
+
+.preloader__ring {
+  fill: none;
+  stroke: rgba($color-secondary, 0.9);
+  stroke-width: 2;
+  stroke-dasharray: 164; // ~ 2πr (r=26)
+  stroke-dashoffset: 164;
+  animation: preloader-draw 1.6s $ease-out-expo forwards;
+}
+
+.preloader__sun {
+  fill: $color-secondary;
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: preloader-pop 0.8s $ease-out-expo 0.5s forwards;
+}
+
+.preloader__horizon {
+  stroke: rgba($color-light, 0.55);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: preloader-draw 1s ease 0.35s forwards;
+}
+
+// ---- Wordmark ---------------------------------------------------------------
+.preloader__name {
+  font-family: $font-display;
+  font-size: clamp(2.4rem, 6vw, 3.4rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  opacity: 0;
+  animation: preloader-rise 0.9s $ease-out-expo 0.45s forwards;
+}
+
+.preloader__sub {
+  margin-top: 0.7rem;
+  font-family: $font-body;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: $tracking-wide;
+  text-transform: uppercase;
+  color: rgba($color-light, 0.75);
+  opacity: 0;
+  animation: preloader-rise 0.9s $ease-out-expo 0.6s forwards;
+}
+
+// ---- Progress bar -----------------------------------------------------------
+.preloader__bar {
+  display: block;
+  width: 170px;
+  height: 2px;
+  margin-top: 1.8rem;
+  border-radius: 2px;
+  background: rgba($color-light, 0.16);
+  overflow: hidden;
+
+  i {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, $color-secondary, $color-light);
+    transform: scaleX(0);
+    transform-origin: left;
+    // Fills over the hold duration so it reads as "loading".
+    animation: preloader-bar var(--preloader-hold, 2200ms) $ease-out-expo forwards;
+  }
+}
+
+@keyframes preloader-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes preloader-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes preloader-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes preloader-bar {
+  to {
+    transform: scaleX(1);
+  }
+}
