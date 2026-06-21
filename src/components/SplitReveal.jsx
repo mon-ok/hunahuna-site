@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import Image from '@/components/Image'
-import { RevealHeading } from '@/components/Motion'
+import { Reveal } from '@/components/Motion'
 import { useInView } from '@/hooks/useInView'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import './SplitReveal.scss'
@@ -43,20 +43,26 @@ export default function SplitReveal({
 
         <div className="split-reveal__text">
           {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-          <RevealHeading as="h2" text={title} active={open} />
-          {children ?? (
-            // PLACEHOLDER copy — replace by passing children.
-            <p className="lead">
-              Wide-open spaces between the palms and the shore, designed for
-              long, unhurried days. As you scroll in, the image steps aside to
-              make room for the story.
-            </p>
-          )}
-          {cta && (
-            <Link to={cta.to} className="btn btn--line">
-              {cta.label}
-            </Link>
-          )}
+          {/* Slow fade-in drifting up from far in the bottom-right. */}
+          <Reveal as="h2" x={140} y={140} duration={1.6} active={open}>
+            {title}
+          </Reveal>
+          {/* Body fades in once the heading has settled (delay ~= its duration). */}
+          <Reveal delay={1.5} duration={0.9} active={open}>
+            {children ?? (
+              // PLACEHOLDER copy — replace by passing children.
+              <p className="lead">
+                Wide-open spaces between the palms and the shore, designed for
+                long, unhurried days. As you scroll in, the image steps aside to
+                make room for the story.
+              </p>
+            )}
+            {cta && (
+              <Link to={cta.to} className="btn btn--line">
+                {cta.label}
+              </Link>
+            )}
+          </Reveal>
         </div>
       </div>
     </section>

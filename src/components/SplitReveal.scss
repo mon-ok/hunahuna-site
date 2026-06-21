@@ -67,7 +67,7 @@
     height: 100%;
     width: 100%;
     aspect-ratio: auto;
-    transition: width $split-duration $ease-out-expo;
+    transition: width $split-image-duration $ease-out-expo;
   }
 
   .split-reveal.is-visible .split-reveal__media {

@@ -17,12 +17,14 @@ const EASE = [0.22, 1, 0.36, 1] // gentle "ease-out-expo"-ish curve
 
 /**
  * Fade + rise into view on scroll. Use for sections, headings, images.
- * `delay` lets you cascade siblings; `y` tunes the rise distance.
+ * `delay` lets you cascade siblings; `x`/`y` tune the offset it drifts in from
+ * (positive = starts down/right -> e.g. fade-in-from-bottom-right).
  */
 export function Reveal({
   children,
   as = 'div',
   delay = 0,
+  x = 0,
   y = 28,
   duration = 0.7,
   className,
@@ -41,8 +43,8 @@ export function Reveal({
     )
   }
 
-  const hidden = { opacity: 0, y }
-  const shown = { opacity: 1, y: 0 }
+  const hidden = { opacity: 0, x, y }
+  const shown = { opacity: 1, x: 0, y: 0 }
   // Controlled (caller passes `active`) vs self-triggering (whileInView).
   const trigger =
     active === undefined
