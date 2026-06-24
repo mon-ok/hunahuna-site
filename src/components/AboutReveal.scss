@@ -5,9 +5,9 @@
 // _variables.scss.
 .about-reveal {
   overflow: hidden;
-  // Soft sand fill — first step of the page's alternating section rhythm
-  // (dark hero → sand → white → sand), so each block reads as distinct.
-  background: $color-sand;
+  // White fill — first step of the page's alternating section rhythm
+  // (dark hero → white → dark blue → white), so each block reads as distinct.
+  background: $color-light;
 }
 
 .about-reveal__inner {
@@ -23,6 +23,21 @@
   padding-inline: 1.5rem;
   @include up('sm') {
     padding-inline: 2.25rem;
+  }
+
+  // Larger type so the half-width text column fills its space (overrides the
+  // global heading/eyebrow/lead sizes for the home section).
+  .eyebrow {
+    font-size: clamp(0.78rem, 1vw, 0.9rem);
+  }
+
+  h2 {
+    font-size: clamp(2.5rem, 4.8vw, 4.25rem);
+    line-height: 1.05;
+  }
+
+  .lead {
+    font-size: clamp(1.3rem, 1.7vw, 1.7rem);
   }
 }
 

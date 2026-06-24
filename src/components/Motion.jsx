@@ -113,18 +113,25 @@ export function StaggerItem({ children, as = 'div', y = 24, className, ...rest }
 }
 
 /**
- * Heading that fades in letter by letter as it scrolls into view. The long
- * per-letter stagger is intentional: it keeps animating gently while the user
- * is still scrolling toward it, rather than snapping in all at once. Spaces are
- * preserved as plain text so the heading still wraps at word boundaries, and
- * the full text is exposed to screen readers via aria-label.
+ * Heading that reveals itself as it scrolls into view, one unit at a time. The
+ * long stagger is intentional: it keeps animating gently while the user is still
+ * scrolling toward it, rather than snapping in all at once. Whitespace is kept as
+ * plain text so the heading still wraps at word boundaries, and the full text is
+ * exposed to screen readers via aria-label.
+ *
+ * `by` picks the flavour:
+ *   'letter' (default) — each letter fades + drifts up a touch (airy, delicate).
+ *   'word'             — each whole word rises up from further below and fades
+ *                        in (bolder, more deliberate) so it reads distinctly
+ *                        from the letter mode.
  */
 export function RevealHeading({
   text,
   as = 'h2',
   className,
-  stagger = 0.07,
-  duration = 1.1,
+  by = 'letter', // 'letter' | 'word'
+  stagger = by === 'word' ? 0.14 : 0.07,
+  duration = by === 'word' ? 0.9 : 1.1,
   active, // omit -> self-triggers on scroll; pass a bool -> caller controls it
   ...rest
 }) {
@@ -144,6 +151,43 @@ export function RevealHeading({
     active === undefined
       ? { whileInView: 'show', viewport: VIEWPORT }
       : { animate: active ? 'show' : 'hidden' }
+
+  // Word mode: split into words while preserving the spaces between them. Each
+  // word rises up from further below and fades in — a chunkier, more deliberate
+  // cadence that reads distinctly from the delicate per-letter fade.
+  if (by === 'word') {
+    const parts = text.split(/(\s+)/) // keeps the whitespace tokens
+    return (
+      <Tag
+        className={className}
+        aria-label={text}
+        initial="hidden"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: stagger } } }}
+        {...trigger}
+        {...rest}
+      >
+        {parts.map((part, i) =>
+          /\s+/.test(part) ? (
+            <span key={i} aria-hidden="true">
+              {part}
+            </span>
+          ) : (
+            <motion.span
+              key={i}
+              aria-hidden="true"
+              style={{ display: 'inline-block' }}
+              variants={{
+                hidden: { opacity: 0, y: 44 },
+                show: { opacity: 1, y: 0, transition: { duration, ease: EASE } },
+              }}
+            >
+              {part}
+            </motion.span>
+          )
+        )}
+      </Tag>
+    )
+  }
 
   return (
     <Tag

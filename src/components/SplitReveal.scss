@@ -6,6 +6,27 @@
   // Drop the inherited .section vertical padding so the media runs flush to the
   // section's top and bottom edges (the split fills the full height on desktop).
   padding-block: 0;
+  // Dark-blue fill — the middle step of the page's alternating rhythm
+  // (white → dark blue → white), matching the home navbar at the very top.
+  background: $color-primary;
+
+  // Light type so the copy stays legible on the dark-blue fill, sized up to
+  // fill the half-width text column (overrides the global sizes).
+  .eyebrow {
+    color: rgba($color-light, 0.85);
+    font-size: clamp(0.78rem, 1vw, 0.9rem);
+  }
+
+  h2 {
+    color: $color-light;
+    font-size: clamp(2.5rem, 4.8vw, 4.25rem);
+    line-height: 1.05;
+  }
+
+  .lead {
+    color: rgba($color-light, 0.92);
+    font-size: clamp(1.3rem, 1.7vw, 1.7rem);
+  }
 }
 
 .split-reveal__inner {

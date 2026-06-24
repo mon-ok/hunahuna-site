@@ -45,11 +45,15 @@
   flex-direction: column;
   align-items: center;
   padding-top: var(--nav-h);
-  max-width: 50rem;
+  // Wider stage so the larger title can stretch across the hero without feeling
+  // boxed in.
+  max-width: 64rem;
 }
 
 .hero-intro__eyebrow {
   color: rgba($color-light, 0.92);
+  // Larger, more present small-caps label over the hero.
+  font-size: clamp(0.82rem, 1.2vw, 1rem);
 }
 
 .hero-intro__title {
@@ -59,6 +63,8 @@
   font-weight: 700;
   letter-spacing: normal;
   line-height: 1.08;
+  // Bumped up so the headline fills the hero (overrides the global h1 clamp).
+  font-size: clamp(3.4rem, 8vw, 6.5rem);
   text-shadow: 0 2px 30px rgba($color-dark, 0.35);
 }
 

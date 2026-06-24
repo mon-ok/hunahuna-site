@@ -1,10 +1,10 @@
 // Animations 3 + 4 — Resources section + hover accordion.
 // Tokens: $resources-* (stagger/fade) and $accordion-* (hover) in _variables.scss.
 
-// Soft sand fill — continues the page's alternating section rhythm so the
-// resources block reads as distinct from the white split-reveal above it.
+// White fill — continues the page's alternating section rhythm so the
+// resources block reads as distinct from the dark-blue split-reveal above it.
 .resources {
-  background: $color-sand;
+  background: $color-light;
 }
 
 // Full-bleed section: the accordion row runs edge-to-edge, so the centered
@@ -13,6 +13,19 @@
   padding-inline: 1.5rem;
   @include up('sm') {
     padding-inline: 2.25rem;
+  }
+
+  // Widen past the default .section__head cap so the larger heading has room to
+  // breathe, and size the type up to match the rest of the home page.
+  max-width: 56rem;
+
+  .eyebrow {
+    font-size: clamp(0.82rem, 1.1vw, 0.95rem);
+  }
+
+  h2 {
+    font-size: clamp(2.7rem, 5.4vw, 4.75rem);
+    line-height: 1.04;
   }
 }
 

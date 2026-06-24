@@ -1,5 +1,5 @@
 import ResourceCard from '@/components/ResourceCard'
-import { RevealHeading } from '@/components/Motion'
+import { Reveal, RevealHeading } from '@/components/Motion'
 import { useInView } from '@/hooks/useInView'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import './Resources.scss'
@@ -57,8 +57,12 @@ export default function Resources({
       className={`resources section ${visible ? 'is-visible' : ''}`}
     >
       <div className="section__head resources__head">
-        {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-        <RevealHeading as="h2" text={title} active={visible} />
+        {eyebrow && (
+          <Reveal as="span" className="eyebrow" x={0} y={-32} duration={0.5} active={visible}>
+            {eyebrow}
+          </Reveal>
+        )}
+        <RevealHeading as="h2" text={title} stagger={0.035} duration={0.5} active={visible} />
       </div>
 
       <ul className="resources__list">

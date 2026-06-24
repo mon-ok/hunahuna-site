@@ -70,9 +70,9 @@ $about-pan-scale: 1.3;         // image zoom that creates room to pan within the
 $about-pan-distance: 16%;      // total horizontal travel of the slow rightward pan
 
 // 2b — Split reveal (image fills the section, then recedes to one half on enter)
-$split-duration: 1.1s;         // text fade as the image recedes
+$split-duration: 1.4s;         // text fade as the image recedes (slow, unhurried)
 $split-image-duration: 2.2s;   // image full-width -> half-width (slow, deliberate recede)
-$split-text-delay: 0.25s;      // text waits a beat as the image recedes
+$split-text-delay: 0.3s;       // text waits a beat as the image recedes
 
 // 3 — Resources header + image stagger
 $resources-duration: 0.8s;

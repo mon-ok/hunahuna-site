@@ -42,13 +42,17 @@ export default function SplitReveal({
         </div>
 
         <div className="split-reveal__text">
-          {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-          {/* Slow fade-in drifting up from far in the bottom-right. */}
-          <Reveal as="h2" x={140} y={140} duration={1.6} active={open}>
+          {eyebrow && (
+            <Reveal as="span" className="eyebrow" x={40} y={-28} duration={0.5} active={open}>
+              {eyebrow}
+            </Reveal>
+          )}
+          {/* Snap in quickly as the section scrolls into view. */}
+          <Reveal as="h2" x={36} y={36} duration={0.45} active={open}>
             {title}
           </Reveal>
-          {/* Body fades in once the heading has settled (delay ~= its duration). */}
-          <Reveal delay={1.5} duration={0.9} active={open}>
+          {/* Body follows just after the heading lands. */}
+          <Reveal delay={0.35} duration={0.5} active={open}>
             {children ?? (
               // PLACEHOLDER copy — replace by passing children.
               <p className="lead">
