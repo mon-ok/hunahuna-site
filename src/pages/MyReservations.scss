@@ -1,10 +1,9 @@
 .reservations {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
-  align-items: start;
-  max-width: 900px;
+  max-width: 520px;
   margin-inline: auto;
-  @include up('md') { grid-template-columns: 1fr 1fr; }
 }
 .reservations__form,
 .reservations__result {

@@ -1,0 +1,140 @@
+.bk-cal {
+  background: $color-light;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 1rem;
+  max-width: 360px;
+}
+
+.bk-cal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.bk-cal__month {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.bk-cal__nav {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid $color-border;
+  background: $color-light;
+  border-radius: $radius-sm;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  &:hover:not(:disabled) {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.bk-cal__weekdays,
+.bk-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.bk-cal__weekdays {
+  margin-bottom: 4px;
+  span {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: $color-muted;
+    text-transform: uppercase;
+  }
+}
+
+.bk-cal__cell {
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  border-radius: $radius-sm;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $color-dark;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+
+  &.is-blank {
+    cursor: default;
+  }
+
+  &:hover:not(:disabled):not(.is-blank) {
+    background: $color-sand-deep;
+  }
+
+  // Availability shading (subtle fills, clear endpoints).
+  &.is-available {
+    background: rgba($color-success, 0.12);
+    color: $color-success;
+  }
+  &.is-booked {
+    background: rgba($color-error, 0.12);
+    color: $color-error;
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+  &.is-booked:hover {
+    background: rgba($color-error, 0.12);
+  }
+
+  &.is-disabled {
+    color: rgba($color-muted, 0.4);
+    cursor: not-allowed;
+  }
+
+  // Selection.
+  &.is-inrange {
+    background: rgba($color-primary, 0.14);
+    color: $color-primary-dark;
+    border-radius: 0;
+  }
+  &.is-endpoint {
+    background: $color-primary;
+    color: $color-light;
+  }
+  &.is-endpoint:hover {
+    background: $color-primary-dark;
+  }
+}
+
+.bk-cal__legend {
+  display: flex;
+  gap: 1.1rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid $color-border;
+  font-size: 0.78rem;
+  color: $color-muted;
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 3px;
+    display: inline-block;
+  }
+  .dot--avail {
+    background: rgba($color-success, 0.5);
+  }
+  .dot--booked {
+    background: rgba($color-error, 0.5);
+  }
+}

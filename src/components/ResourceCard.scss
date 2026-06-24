@@ -61,7 +61,7 @@
 
 .resource-card__label {
   font-family: $font-display;
-  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  font-size: clamp(1.75rem, 2.8vw, 2.6rem);
   line-height: 1.1;
   text-shadow: 0 2px 18px rgba($color-dark, 0.45);
   transition: opacity $accordion-duration $ease-out-expo;
@@ -78,7 +78,7 @@
   margin: 0 0 1rem;
   max-width: 32ch;
   color: rgba($color-light, 0.92);
-  font-size: 0.98rem;
+  font-size: clamp(1.05rem, 1.3vw, 1.2rem);
   opacity: 0;
   transition: opacity $accordion-reveal-duration $ease-out-expo;
 }

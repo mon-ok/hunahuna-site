@@ -1,0 +1,80 @@
+.room-picker {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.room-picker__option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  padding: 1rem 1.1rem;
+  background: $color-light;
+  border: 1.5px solid $color-border;
+  border-radius: $radius-md;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    border-color: rgba($color-primary, 0.5);
+  }
+  &.is-selected {
+    border-color: $color-primary;
+    background: rgba($color-primary, 0.05);
+    box-shadow: 0 0 0 1px $color-primary inset;
+  }
+}
+
+.room-picker__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.room-picker__name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: $color-dark;
+}
+.room-picker__rate {
+  font-size: 0.85rem;
+  color: $color-muted;
+  white-space: nowrap;
+  .price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $color-dark;
+  }
+}
+
+.room-picker__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+// Shared tag styling (mirrors the room-card pill tags).
+.room-picker .tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.65rem;
+  border-radius: $radius-pill;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.tag--guests,
+.tag--count {
+  background: $color-sand-deep;
+  color: $color-muted;
+}
+.tag--aircon {
+  background: rgba($color-secondary, 0.18);
+  color: $color-primary-dark;
+}
+.tag--fan {
+  background: rgba($color-success, 0.14);
+  color: $color-success;
+}

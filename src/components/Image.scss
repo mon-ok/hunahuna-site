@@ -6,9 +6,42 @@
 
 .img--placeholder {
   display: grid;
-  place-items: center;
-  min-height: 160px;
-  color: rgba($color-primary, 0.55);
-  font-size: 2.5rem;
+  place-content: center;
+  justify-items: center;
+  gap: 0.6rem;
+  min-height: 140px;
+  padding: 1rem;
+  overflow: hidden;
+  text-align: center;
+  color: rgba($color-primary, 0.5);
   background: linear-gradient(135deg, $color-sand 0%, $color-sand-deep 100%);
+  // Lets the label hide itself on small thumbnails (see query below).
+  container-type: inline-size;
+}
+
+.img__ph-icon {
+  width: clamp(26px, 22%, 54px);
+  height: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.7;
+}
+
+.img__ph-label {
+  font-family: $font-body;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba($color-primary, 0.5);
+}
+
+// On small placeholders (thumbnails) drop the label — the icon alone reads fine.
+@container (max-width: 150px) {
+  .img__ph-label {
+    display: none;
+  }
 }

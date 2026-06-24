@@ -9,7 +9,10 @@ import './Contact.scss'
 const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL || 'hello@hunahuna.example'
 const PHONE = import.meta.env.VITE_CONTACT_PHONE || '+63 900 000 0000'
 const ADDRESS = import.meta.env.VITE_CONTACT_ADDRESS || 'Beachfront Road, Island Province, Philippines'
-const MAPS_QUERY = encodeURIComponent(ADDRESS)
+// Prefer exact coordinates ("lat,lng") for the map pin; fall back to geocoding
+// the human-readable address when coordinates aren't set.
+const COORDS = import.meta.env.VITE_CONTACT_COORDS || ''
+const MAPS_QUERY = encodeURIComponent(COORDS || ADDRESS)
 
 export default function Contact() {
   const [params] = useSearchParams()
@@ -56,8 +59,8 @@ export default function Contact() {
 
             <h3>Follow along</h3>
             <ul className="contact__socials">
-              <li><a href="#" aria-label="Facebook">Facebook</a></li>
-              <li><a href="#" aria-label="Instagram">Instagram</a></li>
+              <li><a href="https://www.facebook.com/HunaHunaCliffResort" aria-label="Facebook">Facebook</a></li>
+              {/* <li><a href="#" aria-label="Instagram">Instagram</a></li> */}
             </ul>
 
             <div className="contact__map">

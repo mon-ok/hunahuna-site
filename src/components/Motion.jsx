@@ -15,6 +15,18 @@ const VIEWPORT = { once: true, amount: 0.3, margin: '0px 0px -25% 0px' }
 
 const EASE = [0.22, 1, 0.36, 1] // gentle "ease-out-expo"-ish curve
 
+// Tokenize a heading into reveal segments: each is either whitespace or a run of
+// characters that must stay together on one line. Words are split at hyphens so
+// a long compound ("Spanish-Mediterranean") can still wrap after the hyphen,
+// while the animated inline-block letters never break mid-word.
+function revealSegments(text) {
+  return text.split(/(\s+)/).flatMap((tok) => {
+    if (tok === '') return []
+    if (/^\s+$/.test(tok)) return [tok]
+    return tok.match(/[^-]+-?|-+/g) ?? [tok]
+  })
+}
+
 /**
  * Fade + rise into view on scroll. Use for sections, headings, images.
  * `delay` lets you cascade siblings; `x`/`y` tune the offset it drifts in from
@@ -113,18 +125,25 @@ export function StaggerItem({ children, as = 'div', y = 24, className, ...rest }
 }
 
 /**
- * Heading that fades in letter by letter as it scrolls into view. The long
- * per-letter stagger is intentional: it keeps animating gently while the user
- * is still scrolling toward it, rather than snapping in all at once. Spaces are
- * preserved as plain text so the heading still wraps at word boundaries, and
- * the full text is exposed to screen readers via aria-label.
+ * Heading that reveals itself as it scrolls into view, one unit at a time. The
+ * long stagger is intentional: it keeps animating gently while the user is still
+ * scrolling toward it, rather than snapping in all at once. Whitespace is kept as
+ * plain text so the heading still wraps at word boundaries, and the full text is
+ * exposed to screen readers via aria-label.
+ *
+ * `by` picks the flavour:
+ *   'letter' (default) — each letter fades + drifts up a touch (airy, delicate).
+ *   'word'             — each whole word rises up from further below and fades
+ *                        in (bolder, more deliberate) so it reads distinctly
+ *                        from the letter mode.
  */
 export function RevealHeading({
   text,
   as = 'h2',
   className,
-  stagger = 0.07,
-  duration = 1.1,
+  by = 'letter', // 'letter' | 'word'
+  stagger = by === 'word' ? 0.14 : 0.07,
+  duration = by === 'word' ? 0.9 : 1.1,
   active, // omit -> self-triggers on scroll; pass a bool -> caller controls it
   ...rest
 }) {
@@ -145,32 +164,86 @@ export function RevealHeading({
       ? { whileInView: 'show', viewport: VIEWPORT }
       : { animate: active ? 'show' : 'hidden' }
 
+  // Word mode: split into words while preserving the spaces between them. Each
+  // word rises up from further below and fades in — a chunkier, more deliberate
+  // cadence that reads distinctly from the delicate per-letter fade.
+  if (by === 'word') {
+    const parts = text.split(/(\s+)/) // keeps the whitespace tokens
+    return (
+      <Tag
+        className={className}
+        aria-label={text}
+        initial="hidden"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: stagger } } }}
+        {...trigger}
+        {...rest}
+      >
+        {parts.map((part, i) =>
+          /\s+/.test(part) ? (
+            <span key={i} aria-hidden="true">
+              {part}
+            </span>
+          ) : (
+            <motion.span
+              key={i}
+              aria-hidden="true"
+              style={{ display: 'inline-block' }}
+              variants={{
+                hidden: { opacity: 0, y: 44 },
+                show: { opacity: 1, y: 0, transition: { duration, ease: EASE } },
+              }}
+            >
+              {part}
+            </motion.span>
+          )
+        )}
+      </Tag>
+    )
+  }
+
+  // Letter mode: animate each letter, but keep whole words intact so the line
+  // only ever breaks at spaces. (Bare inline-block letters let the browser break
+  // mid-word — "Comfor|t" — which reads as a cut heading.) Each word is wrapped
+  // in a nowrap inline-block; an explicit per-letter delay replaces
+  // staggerChildren so the word wrappers can sit between the parent and letters.
+  const segments = revealSegments(text)
+  let letterIndex = 0
   return (
     <Tag
       className={className}
       aria-label={text}
       initial="hidden"
-      variants={{ hidden: {}, show: { transition: { staggerChildren: stagger } } }}
+      variants={{ hidden: {}, show: {} }}
       {...trigger}
       {...rest}
     >
-      {[...text].map((ch, i) =>
-        ch === ' ' ? (
-          <span key={i} aria-hidden="true">
-            {' '}
+      {segments.map((seg, s) =>
+        /^\s+$/.test(seg) ? (
+          <span key={`s${s}`} aria-hidden="true">
+            {seg}
           </span>
         ) : (
-          <motion.span
-            key={i}
+          <span
+            key={`w${s}`}
             aria-hidden="true"
-            style={{ display: 'inline-block' }}
-            variants={{
-              hidden: { opacity: 0, y: 16 },
-              show: { opacity: 1, y: 0, transition: { duration, ease: EASE } },
-            }}
+            style={{ display: 'inline-block', whiteSpace: 'nowrap' }}
           >
-            {ch}
-          </motion.span>
+            {[...seg].map((ch, ci) => {
+              const delay = letterIndex++ * stagger
+              return (
+                <motion.span
+                  key={`${s}-${ci}`}
+                  style={{ display: 'inline-block' }}
+                  variants={{
+                    hidden: { opacity: 0, y: 16 },
+                    show: { opacity: 1, y: 0, transition: { duration, ease: EASE, delay } },
+                  }}
+                >
+                  {ch}
+                </motion.span>
+              )
+            })}
+          </span>
         )
       )}
     </Tag>

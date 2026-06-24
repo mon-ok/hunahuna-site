@@ -15,7 +15,12 @@ export default function BookingConfirmation() {
   return (
     <section className="section">
       <div className="container confirm">
-        <div className="confirm__icon" aria-hidden="true">🎉</div>
+        {state.simulated && (
+          <p className="confirm__test" role="status">
+            🧪 Test mode — this is a simulated reservation. Nothing was saved.
+          </p>
+        )}
+        {/* <div className="confirm__icon" aria-hidden="true">🎉</div> */}
         <h1>Reservation requested!</h1>
         <p className="confirm__lead">
           Thanks for booking with Hunahuna. Your reservation is <strong>pending</strong>,

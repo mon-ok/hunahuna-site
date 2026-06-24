@@ -3,31 +3,27 @@ import AboutReveal from '@/components/AboutReveal'
 import SplitReveal from '@/components/SplitReveal'
 import Resources from '@/components/Resources'
 
-// Home page. Four scroll/hover animations across the section. Image paths here
-// fall back to the Image component's 🌴 tile until you drop real files in
-// /public (see the paths below) or pass your own props.
+// Home page. Four scroll/hover animations across the section.
 export default function Home() {
   return (
     <>
       {/* Animation 1: hero zoom + heading reveal (plays on load) */}
       <HeroIntro
-        src="/hunahuna-hero.jpg"
-        alt="Sunset over the resort beach"
-        eyebrow="Hunahuna Beach Resort"
-        title="Your slice of tropical paradise"
+        src="/hunahuna-hero.png"
+        alt="Sunset over Huna Huna Cliff Resort"
+        eyebrow="Huna Huna Cliff Resort"
+        title="Your Next Spanish-Mediterranean Destination"
       />
 
       {/* Animation 2: about split reveal (scroll down to trigger) */}
       <AboutReveal
-        src="/hunahuna-about.jpg"
-        alt="A quiet corner of the resort"
-        eyebrow="Our story"
-        title="Where the palms meet the shore"
+        src="/hunahuna-about.png"
+        alt="Huna Huna Cliff Resort hillside view of the Camotes Sea"
+        eyebrow="Spanish-Mediterranean Sanctuary"
+        title="Overlooking the Camotes Sea"
       >
         <p className="lead">
-          A handful of cottages tucked between palm groves and a quiet beach,
-          close enough to reach easily, far enough to feel like an escape. Scroll
-          past and watch the image slide to the right half as this copy fades in.
+          Perched on the hillside of Catmon, Northern Cebu, just a scenic 45-kilometer drive north of Cebu City, Huna Huna Cliff Resort offers a refreshing blend of discovery, excitement, and relaxation.
         </p>
       </AboutReveal>
 
@@ -35,46 +31,46 @@ export default function Home() {
           (text fades into the right) when it scrolls into view. */}
       <SplitReveal
         src="/hunahuna-split.jpg"
-        alt="A wide view across the resort"
-        eyebrow="The setting"
-        title="Room to breathe"
+        alt="Overlooking the cliffside resort and ocean"
+        eyebrow="Our Story"
+        title="Crafted Over Two Decades"
         mediaSide="left"
+        cta={{ to: '/about', label: 'Explore Our Story' }}
       >
         <p className="lead">
-          Wide-open spaces between the palms and the shore, designed for long,
-          unhurried days. Scroll in and watch the image step aside to make room
-          for the story.
+          Our journey began when we visited and fell in love with what was then the Monte Carlo Resort. Originally buying just four rooms, the restaurant, and the land in between, my wife Merly and I envisioned a unique seaside getaway.
         </p>
       </SplitReveal>
 
       {/* Animations 3 + 4: resources stagger-in, then hover/focus the cards */}
       <Resources
-        eyebrow="Explore the resort"
-        title="Where the days unfold"
+        eyebrow="Resort Facilities"
+        title="Designed for Your Comfort"
         items={[
           {
-            src: '/hunahuna-pool.jpg',
-            alt: 'The beachfront pool',
-            label: 'The Pool',
-            description: 'An infinity edge that melts into the horizon at golden hour.',
-            ctaHref: '/rooms',
+            src: '/hunahuna-pool.png',
+            alt: 'Revamped infinity edge sea pool with jacuzzi',
+            label: 'Infinity Sea Pool',
+            description: 'A beautiful infinity pool overlooking the ocean, featuring two hydrotherapy beds, an in-pool bar, a jacuzzi, and an expanded deck area perfect for weddings and celebrations.',
+            ctaHref: '/amenities',
           },
           {
-            src: '/hunahuna-restaurant.jpg',
-            alt: 'The restaurant terrace',
-            label: 'Restaurant',
-            description: 'Fresh local seafood and island favourites, toes near the sand.',
+            src: '/hunahuna-restaurant.png',
+            alt: 'Lower deck restaurant and wood pizza oven',
+            label: 'Lower Deck Dining',
+            description: 'Enjoy delicious meals from our lower deck buffet counter, featuring traditional wood-fired pizza ovens and stunning panoramic coastal views.',
             ctaHref: '/menu',
           },
           {
             src: '/hunahuna-spa.jpg',
-            alt: 'A garden spa cabana',
-            label: 'The Spa',
-            description: 'Unhurried treatments in open-air cabanas among the palms.',
-            ctaHref: '/amenities',
+            alt: 'Revamped cottages and event space',
+            label: 'Cottages & Events',
+            description: 'Featuring a long cottage seating 20+ guests for conferences or parties, and revamped cozy cottages with custom undercover seating connected for your comfort.',
+            ctaHref: '/rooms',
           },
         ]}
       />
     </>
   )
 }
+

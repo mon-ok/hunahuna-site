@@ -1,5 +1,5 @@
 import Image from '@/components/Image'
-import { Reveal, RevealHeading } from '@/components/Motion'
+import { Reveal } from '@/components/Motion'
 import { useInView } from '@/hooks/useInView'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import { useScrollProgress } from '@/hooks/useScrollProgress'
@@ -41,12 +41,15 @@ export default function AboutReveal({
           {/* Cascade: eyebrow fades up, the heading reveals letter by letter,
               then the body copy fades up a beat later. */}
           {eyebrow && (
-            <Reveal as="span" className="eyebrow" y={16} duration={0.9} active={open}>
+            <Reveal as="span" className="eyebrow" x={-40} y={-28} duration={1.2} active={open}>
               {eyebrow}
             </Reveal>
           )}
-          <RevealHeading as="h2" text={title} active={open} />
-          <Reveal y={20} duration={1.1} delay={0.25} active={open}>
+          {/* Simple fade-in (opacity only). */}
+          <Reveal as="h2" x={0} y={0} duration={1.5} delay={0.2} active={open}>
+            {title}
+          </Reveal>
+          <Reveal y={20} duration={1.5} delay={0.35} active={open}>
             {children ?? (
               // PLACEHOLDER copy — replace by passing children.
               <p className="lead">
