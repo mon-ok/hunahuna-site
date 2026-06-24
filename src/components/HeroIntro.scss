@@ -64,7 +64,9 @@
   letter-spacing: normal;
   line-height: 1.08;
   // Bumped up so the headline fills the hero (overrides the global h1 clamp).
-  font-size: clamp(3.4rem, 8vw, 6.5rem);
+  // Lower floor keeps long words (e.g. "Spanish-Mediterranean") from overflowing
+  // on narrow phones now that words wrap as whole units rather than mid-letter.
+  font-size: clamp(2.6rem, 8vw, 6.5rem);
   text-shadow: 0 2px 30px rgba($color-dark, 0.35);
 }
 

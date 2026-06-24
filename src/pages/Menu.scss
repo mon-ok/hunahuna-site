@@ -1,22 +1,103 @@
-.menu-toggle {
-  display: inline-flex;
+// Kiosk layout: filter sidebar on the left, gallery of items on the right.
+.menu-kiosk {
+  display: grid;
+  gap: 1.5rem;
+  @include up('md') {
+    grid-template-columns: 240px 1fr;
+    align-items: start;
+    gap: 2.5rem;
+  }
+}
+
+.menu-kiosk__sidebar {
+  @include up('md') {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+// --- Outlet switcher (Restaurant / Bar) --------------------------------------
+.menu-outlets {
+  display: flex;
   gap: 0.25rem;
   padding: 0.3rem;
   background: $color-sand;
   border-radius: $radius-pill;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
 }
-.menu-toggle__btn {
+.menu-outlets__btn {
+  flex: 1;
   border: none;
   background: transparent;
-  padding: 0.6rem 1.3rem;
+  padding: 0.6rem 0.9rem;
   border-radius: $radius-pill;
   font-weight: 700;
   color: $color-muted;
+  white-space: nowrap;
   transition: background 0.15s ease, color 0.15s ease;
   &.is-active {
     background: $color-light;
     color: $color-primary;
     box-shadow: $shadow-sm;
+  }
+}
+
+// --- Category tags -----------------------------------------------------------
+.menu-cats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.menu-cats__btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 0.6rem 0.85rem;
+  border-radius: $radius-md;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $color-text;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  &:hover {
+    background: $color-sand;
+  }
+  &.is-active {
+    background: rgba($color-primary, 0.1);
+    border-color: rgba($color-primary, 0.25);
+    color: $color-primary-dark;
+  }
+}
+.menu-cats__count {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: $color-muted;
+  background: $color-sand-deep;
+  border-radius: $radius-pill;
+  padding: 0.05rem 0.5rem;
+  .menu-cats__btn.is-active & {
+    background: rgba($color-primary, 0.16);
+    color: $color-primary-dark;
+  }
+}
+
+// On phones the sidebar sits on top; let the category tags scroll horizontally
+// so they don't push the gallery far down the page.
+@media (max-width: 899px) {
+  .menu-cats {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.4rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .menu-cats__btn {
+    width: auto;
+    white-space: nowrap;
   }
 }

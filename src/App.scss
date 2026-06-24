@@ -13,3 +13,16 @@
 .app__main > div > .section:first-child {
   padding-top: calc(var(--nav-h) + clamp(2.5rem, 6vw, 5rem));
 }
+
+// Full-screen panel for the home page wipe transition. Sits above everything
+// (including the fixed navbar) so it reads as a true screen wipe; the brand
+// gradient gives the sweep some depth. Pointer-events off so it never blocks
+// the swap happening underneath.
+.page-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: $z-lightbox + 1;
+  background: $color-sunset;
+  pointer-events: none;
+  will-change: transform;
+}

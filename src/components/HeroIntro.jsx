@@ -17,6 +17,18 @@ const ROTATE_DURATION = 1.7 // how long the whole-line rotate-in takes
 //   down -> rotateInDownRight (drops in from a +45 deg tilt)
 const ROTATE_FROM = { up: -90, down: 45 }
 
+// Tokenize a line into reveal segments: each is either whitespace or a run that
+// must stay together on one line. Words split at hyphens so a long compound
+// ("Spanish-Mediterranean") can wrap after the hyphen, while the animated
+// inline-block letters never break mid-word.
+function revealSegments(text) {
+  return text.split(/(\s+)/).flatMap((tok) => {
+    if (tok === '') return []
+    if (/^\s+$/.test(tok)) return [tok]
+    return tok.match(/[^-]+-?|-+/g) ?? [tok]
+  })
+}
+
 /**
  * One hero line whose entrance runs two effects at once: the letters fade in one
  * after another (staggered) while the whole line simultaneously rotates into
@@ -25,7 +37,10 @@ const ROTATE_FROM = { up: -90, down: 45 }
  * The outer element handles the rotate; the inner element staggers the fade.
  */
 function HeroLine({ text, as = 'span', className = '', rotate = 'up', start, reduce }) {
-  const chars = useMemo(() => [...text], [text])
+  // Split into segments (words, broken at hyphens, plus whitespace tokens) so
+  // each stays on one line; letters still fade in one by one via `letters`.
+  const segments = useMemo(() => revealSegments(text), [text])
+  let letters = 0
   const MotionTag = motion[as] ?? motion.span
   const from = ROTATE_FROM[rotate] ?? 0
 
@@ -48,25 +63,39 @@ function HeroLine({ text, as = 'span', className = '', rotate = 'up', start, red
         style={{ display: 'inline-block' }}
         initial="hidden"
         animate={start ? 'show' : 'hidden'}
-        variants={{ hidden: {}, show: { transition: { staggerChildren: LETTER_STAGGER } } }}
+        variants={{ hidden: {}, show: {} }}
       >
-        {chars.map((ch, i) =>
-          ch === ' ' ? (
-            <span key={i} aria-hidden="true">
-              {' '}
+        {/* Group the staggered letters by word, each word a nowrap inline-block,
+            so the headline only ever breaks at spaces — never mid-word
+            ("Spanish-Mediterranean" stays whole). Explicit per-letter delay
+            stands in for staggerChildren now that words nest the letters. */}
+        {segments.map((seg, s) =>
+          /^\s+$/.test(seg) ? (
+            <span key={`s${s}`} aria-hidden="true">
+              {seg}
             </span>
           ) : (
-            <motion.span
-              key={i}
+            <span
+              key={`w${s}`}
               aria-hidden="true"
-              style={{ display: 'inline-block' }}
-              variants={{
-                hidden: { opacity: 0 },
-                show: { opacity: 1, transition: { duration: LETTER_FADE, ease: 'easeOut' } },
-              }}
+              style={{ display: 'inline-block', whiteSpace: 'nowrap' }}
             >
-              {ch}
-            </motion.span>
+              {[...seg].map((ch, ci) => {
+                const delay = letters++ * LETTER_STAGGER
+                return (
+                  <motion.span
+                    key={`${s}-${ci}`}
+                    style={{ display: 'inline-block' }}
+                    variants={{
+                      hidden: { opacity: 0 },
+                      show: { opacity: 1, transition: { duration: LETTER_FADE, ease: 'easeOut', delay } },
+                    }}
+                  >
+                    {ch}
+                  </motion.span>
+                )
+              })}
+            </span>
           )
         )}
       </motion.span>

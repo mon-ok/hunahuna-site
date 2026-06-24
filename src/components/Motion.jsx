@@ -15,6 +15,18 @@ const VIEWPORT = { once: true, amount: 0.3, margin: '0px 0px -25% 0px' }
 
 const EASE = [0.22, 1, 0.36, 1] // gentle "ease-out-expo"-ish curve
 
+// Tokenize a heading into reveal segments: each is either whitespace or a run of
+// characters that must stay together on one line. Words are split at hyphens so
+// a long compound ("Spanish-Mediterranean") can still wrap after the hyphen,
+// while the animated inline-block letters never break mid-word.
+function revealSegments(text) {
+  return text.split(/(\s+)/).flatMap((tok) => {
+    if (tok === '') return []
+    if (/^\s+$/.test(tok)) return [tok]
+    return tok.match(/[^-]+-?|-+/g) ?? [tok]
+  })
+}
+
 /**
  * Fade + rise into view on scroll. Use for sections, headings, images.
  * `delay` lets you cascade siblings; `x`/`y` tune the offset it drifts in from
@@ -189,32 +201,49 @@ export function RevealHeading({
     )
   }
 
+  // Letter mode: animate each letter, but keep whole words intact so the line
+  // only ever breaks at spaces. (Bare inline-block letters let the browser break
+  // mid-word — "Comfor|t" — which reads as a cut heading.) Each word is wrapped
+  // in a nowrap inline-block; an explicit per-letter delay replaces
+  // staggerChildren so the word wrappers can sit between the parent and letters.
+  const segments = revealSegments(text)
+  let letterIndex = 0
   return (
     <Tag
       className={className}
       aria-label={text}
       initial="hidden"
-      variants={{ hidden: {}, show: { transition: { staggerChildren: stagger } } }}
+      variants={{ hidden: {}, show: {} }}
       {...trigger}
       {...rest}
     >
-      {[...text].map((ch, i) =>
-        ch === ' ' ? (
-          <span key={i} aria-hidden="true">
-            {' '}
+      {segments.map((seg, s) =>
+        /^\s+$/.test(seg) ? (
+          <span key={`s${s}`} aria-hidden="true">
+            {seg}
           </span>
         ) : (
-          <motion.span
-            key={i}
+          <span
+            key={`w${s}`}
             aria-hidden="true"
-            style={{ display: 'inline-block' }}
-            variants={{
-              hidden: { opacity: 0, y: 16 },
-              show: { opacity: 1, y: 0, transition: { duration, ease: EASE } },
-            }}
+            style={{ display: 'inline-block', whiteSpace: 'nowrap' }}
           >
-            {ch}
-          </motion.span>
+            {[...seg].map((ch, ci) => {
+              const delay = letterIndex++ * stagger
+              return (
+                <motion.span
+                  key={`${s}-${ci}`}
+                  style={{ display: 'inline-block' }}
+                  variants={{
+                    hidden: { opacity: 0, y: 16 },
+                    show: { opacity: 1, y: 0, transition: { duration, ease: EASE, delay } },
+                  }}
+                >
+                  {ch}
+                </motion.span>
+              )
+            })}
+          </span>
         )
       )}
     </Tag>

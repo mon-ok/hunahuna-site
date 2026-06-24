@@ -3,6 +3,16 @@
   margin-inline: auto;
   text-align: center;
 }
+.confirm__test {
+  background: rgba($color-secondary, 0.18);
+  border: 1px solid rgba($color-primary, 0.3);
+  border-radius: $radius-md;
+  padding: 0.7rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $color-primary-dark;
+  margin-bottom: 1.5rem;
+}
 .confirm__icon {
   font-size: 3.5rem;
 }

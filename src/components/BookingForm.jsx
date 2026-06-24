@@ -1,19 +1,68 @@
 import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
-import { useAvailability, useRateQuote } from '@/hooks/useAvailability'
 import { useCreateBooking } from '@/hooks/useCreateBooking'
+import { useRoomBookings } from '@/hooks/useRoomBookings'
+import RoomTypePicker from '@/components/RoomTypePicker'
+import BookingCalendar from '@/components/BookingCalendar'
+import {
+  addDays,
+  ymd,
+  parseYmd,
+  anyRoomFreeOnNight,
+  firstFreeRoom,
+} from '@/lib/availability'
 import { estimateStay, formatMoney, nightsBetween } from '@/lib/rates'
 import './BookingForm.scss'
 
 // Live booking writes are gated until the backend trio (RLS + RPCs) is in place.
 const BOOKING_ENABLED = import.meta.env.VITE_BOOKING_ENABLED === 'true'
 
-const today = () => new Date().toISOString().slice(0, 10)
+// Test mode lets the full flow run end-to-end without a real DB write — the
+// booking RPC isn't deployed and direct inserts are blocked by RLS. A simulated
+// reservation is created so the confirmation page (a future digital receipt /
+// PayMongo step) can be exercised. Ignored when real writes are enabled.
+const TEST_MODE = import.meta.env.VITE_BOOKING_TEST_MODE === 'true'
+const CAN_SUBMIT = BOOKING_ENABLED || TEST_MODE
+
+// Short, human-readable reference for a simulated booking.
+function makeTestRef() {
+  return `TEST-${Math.random().toString(36).slice(2, 7).toUpperCase()}`
+}
+
+// Bookings can only be made at least this many days ahead of today.
+const LEAD_DAYS = 2
+
+// Collapse identical rooms into one entry per type, carrying the concrete rooms
+// so we can attach an available one to the reservation.
+function groupByType(rooms) {
+  const map = new Map()
+  for (const room of rooms) {
+    let g = map.get(room.room_type)
+    if (!g) {
+      g = { type: room.room_type, count: 0, representative: room, rooms: [] }
+      map.set(room.room_type, g)
+    }
+    g.count += 1
+    g.rooms.push(room)
+  }
+  return [...map.values()]
+}
+
+function formatNice(dStr) {
+  if (!dStr) return '—'
+  return parseYmd(dStr).toLocaleDateString(undefined, {
+    weekday: 'short', month: 'short', day: 'numeric',
+  })
+}
 
 export default function BookingForm({ rooms = [], preselectedRoomId }) {
   const navigate = useNavigate()
   const createBooking = useCreateBooking()
+  const { data: bookings = [] } = useRoomBookings()
+
+  const groups = useMemo(() => groupByType(rooms), [rooms])
+  const minDate = useMemo(() => ymd(addDays(new Date(), LEAD_DAYS)), [])
 
   const {
     register,
@@ -23,7 +72,8 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      roomId: preselectedRoomId || '',
+      roomType: '',
+      roomId: '',
       checkIn: '',
       checkOut: '',
       numGuests: 1,
@@ -35,35 +85,89 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
     },
   })
 
+  // Register the fields the picker/calendar drive via setValue.
   useEffect(() => {
-    if (preselectedRoomId) setValue('roomId', preselectedRoomId)
-  }, [preselectedRoomId, setValue])
+    register('roomType', { required: 'Please choose a room.' })
+    register('roomId', { required: true })
+    register('checkIn', { required: 'Select your dates.' })
+    register('checkOut', { required: 'Select your dates.' })
+  }, [register])
 
+  const roomType = watch('roomType')
   const roomId = watch('roomId')
   const checkIn = watch('checkIn')
   const checkOut = watch('checkOut')
   const numGuests = Number(watch('numGuests'))
 
-  const room = useMemo(
-    () => rooms.find((r) => String(r.id) === String(roomId)),
-    [rooms, roomId]
+  const group = useMemo(
+    () => groups.find((g) => g.type === roomType),
+    [groups, roomType]
   )
+  const room = group?.representative
+
+  // Preselect the type from a ?room=<id> link (e.g. arriving from a room page).
+  useEffect(() => {
+    if (!preselectedRoomId || roomType) return
+    const match = rooms.find((r) => String(r.id) === String(preselectedRoomId))
+    if (match) setValue('roomType', match.room_type, { shouldValidate: true })
+  }, [preselectedRoomId, rooms, roomType, setValue])
 
   const datesValid = Boolean(checkIn && checkOut && checkOut > checkIn)
-  const availability = useAvailability({ roomId, checkIn, checkOut })
-  const rateQuote = useRateQuote({ roomId, checkIn, checkOut })
 
-  // Server total is authoritative; client estimate is a fallback for display.
+  // Attach a concrete, conflict-free room of the chosen type for the range.
+  useEffect(() => {
+    if (!group || !datesValid) {
+      if (roomId) setValue('roomId', '')
+      return
+    }
+    const resolved = firstFreeRoom(group.rooms, bookings, checkIn, checkOut) || ''
+    setValue('roomId', resolved, { shouldValidate: true })
+  }, [group, datesValid, checkIn, checkOut, bookings, roomId, setValue])
+
+  const isNightAvailable = useMemo(() => {
+    if (!group) return undefined
+    return (dStr) => anyRoomFreeOnNight(group.rooms, bookings, dStr)
+  }, [group, bookings])
+
   const estimate = room ? estimateStay(room, checkIn, checkOut) : null
   const nights = nightsBetween(checkIn, checkOut)
-  const serverTotal = rateQuote.data?.total_amount
-  const displayTotal = serverTotal ?? estimate?.total ?? null
+  const displayTotal = estimate?.total ?? null
 
-  const overOccupancy = room && numGuests > room.max_occupancy
-  const unavailable = datesValid && availability.data === false
+  const occupancyMax = room?.max_occupancy
+  const guestsOver = occupancyMax && numGuests > occupancyMax
+  const unavailable = datesValid && group && !roomId
+
+  const onChangeDates = ({ checkIn: ci, checkOut: co }) => {
+    setValue('checkIn', ci, { shouldValidate: true })
+    setValue('checkOut', co, { shouldValidate: true })
+  }
+
+  const onSelectType = (type) => {
+    setValue('roomType', type, { shouldValidate: true })
+    // A different type may not have the same rooms free for the current range;
+    // roomId re-resolves via the effect above.
+  }
 
   const onSubmit = async (values) => {
-    if (!BOOKING_ENABLED) return
+    if (!CAN_SUBMIT) return
+
+    // Simulated submission — no persistence until the backend goes live.
+    if (TEST_MODE && !BOOKING_ENABLED) {
+      await new Promise((r) => setTimeout(r, 500)) // mimic a network round-trip
+      navigate('/booking/confirmed', {
+        state: {
+          booking: {
+            booking_ref: makeTestRef(),
+            total_amount: displayTotal,
+            status: 'pending',
+          },
+          roomType: group?.type,
+          simulated: true,
+        },
+      })
+      return
+    }
+
     try {
       const result = await createBooking.mutateAsync({
         fullName: values.fullName,
@@ -77,7 +181,7 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
         notes: values.notes,
       })
       navigate('/booking/confirmed', {
-        state: { booking: result, roomType: room?.room_type },
+        state: { booking: result, roomType: group?.type },
       })
     } catch {
       // Error surfaced below via createBooking.error
@@ -86,7 +190,14 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
 
   return (
     <form className="booking-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-      {!BOOKING_ENABLED && (
+      {!BOOKING_ENABLED && TEST_MODE && (
+        <p className="booking-form__notice" role="status">
+          🧪 Test mode: you can submit and walk the full flow, but the
+          reservation is <strong>simulated only</strong> — nothing is saved to
+          the database yet.
+        </p>
+      )}
+      {!BOOKING_ENABLED && !TEST_MODE && (
         <p className="booking-form__notice" role="status">
           🛠️ Online booking is in preview. You can explore the flow, but
           submissions are disabled until the booking backend goes live.
@@ -94,62 +205,69 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
       )}
 
       <fieldset className="booking-form__group">
-        <legend>Your stay</legend>
+        <legend>Choose your room</legend>
+        <RoomTypePicker groups={groups} value={roomType} onSelect={onSelectType} />
+        {errors.roomType && <p className="field__error">{errors.roomType.message}</p>}
+      </fieldset>
 
-        <div className="field">
-          <label className="field__label" htmlFor="roomId">Room / cottage</label>
-          <select
-            id="roomId"
-            className="field__control"
-            {...register('roomId', { required: 'Please choose a room.' })}
-          >
-            <option value="">Select a room…</option>
-            {rooms.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.room_type}, sleeps {r.max_occupancy}
-              </option>
-            ))}
-          </select>
-          {errors.roomId && <p className="field__error">{errors.roomId.message}</p>}
-        </div>
+      <fieldset className="booking-form__group">
+        <legend>Choose your dates</legend>
 
-        <div className="booking-form__row">
-          <div className="field">
-            <label className="field__label" htmlFor="checkIn">Check-in</label>
-            <input
-              id="checkIn"
-              type="date"
-              min={today()}
-              className="field__control"
-              {...register('checkIn', { required: 'Select a check-in date.' })}
-            />
+        <div className="booking-dates">
+          <BookingCalendar
+            checkIn={checkIn}
+            checkOut={checkOut}
+            onChange={onChangeDates}
+            minDate={minDate}
+            showAvailability={Boolean(group)}
+            isNightAvailable={isNightAvailable}
+          />
+
+          <div className="booking-dates__info">
+            {!group && (
+              <p className="booking-dates__hint">
+                Pick a room above to see which dates are open.
+              </p>
+            )}
+            <div className="booking-dates__chips">
+              <div className="booking-dates__chip">
+                <span className="booking-dates__chip-label">Check-in</span>
+                <span className="booking-dates__chip-value">{formatNice(checkIn)}</span>
+              </div>
+              <div className="booking-dates__chip">
+                <span className="booking-dates__chip-label">Check-out</span>
+                <span className="booking-dates__chip-value">{formatNice(checkOut)}</span>
+              </div>
+            </div>
+            <p className="booking-dates__lead">
+              Bookings open from <strong>{formatNice(minDate)}</strong> ({LEAD_DAYS} days
+              ahead).
+            </p>
             {errors.checkIn && <p className="field__error">{errors.checkIn.message}</p>}
-          </div>
-
-          <div className="field">
-            <label className="field__label" htmlFor="checkOut">Check-out</label>
-            <input
-              id="checkOut"
-              type="date"
-              min={checkIn || today()}
-              className="field__control"
-              {...register('checkOut', {
-                required: 'Select a check-out date.',
-                validate: (v) =>
-                  !checkIn || v > checkIn || 'Check-out must be after check-in.',
-              })}
-            />
-            {errors.checkOut && <p className="field__error">{errors.checkOut.message}</p>}
+            {unavailable && (
+              <p className="booking-form__status booking-form__status--bad">
+                No {group.type} is free for the whole of those dates. Try different
+                dates or another room.
+              </p>
+            )}
+            {datesValid && roomId && (
+              <p className="booking-form__status booking-form__status--ok">
+                ✓ Available for your dates
+              </p>
+            )}
           </div>
         </div>
+      </fieldset>
 
+      <fieldset className="booking-form__group">
+        <legend>Guests</legend>
         <div className="field">
-          <label className="field__label" htmlFor="numGuests">Guests</label>
+          <label className="field__label" htmlFor="numGuests">Number of guests</label>
           <input
             id="numGuests"
             type="number"
             min={1}
-            max={room?.max_occupancy || undefined}
+            max={occupancyMax || undefined}
             className="field__control"
             {...register('numGuests', {
               required: true,
@@ -158,32 +276,12 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
             })}
           />
           {room && (
-            <p className="field__hint">Max occupancy for {room.room_type}: {room.max_occupancy}</p>
+            <p className="field__hint">Max occupancy for {group.type}: {occupancyMax}</p>
           )}
-          {overOccupancy && (
-            <p className="field__error">Exceeds the room's maximum of {room.max_occupancy} guests.</p>
+          {guestsOver && (
+            <p className="field__error">Exceeds the room's maximum of {occupancyMax} guests.</p>
           )}
         </div>
-
-        {/* Live availability + rate feedback */}
-        {datesValid && room && (
-          <div className="booking-form__status" aria-live="polite">
-            {availability.isLoading && <span>Checking availability…</span>}
-            {availability.isError && (
-              <span className="booking-form__status--warn">
-                Couldn't check availability right now.
-              </span>
-            )}
-            {unavailable && (
-              <span className="booking-form__status--bad">
-                Those dates aren't available for this room.
-              </span>
-            )}
-            {availability.data === true && (
-              <span className="booking-form__status--ok">✓ Available</span>
-            )}
-          </div>
-        )}
       </fieldset>
 
       <fieldset className="booking-form__group">
@@ -246,7 +344,7 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
       {room && datesValid && nights > 0 && (
         <div className="booking-form__summary">
           <div className="booking-form__summary-row">
-            <span>{room.room_type}</span>
+            <span>{group.type}</span>
             <span>{nights} night{nights > 1 ? 's' : ''}</span>
           </div>
           {displayTotal != null && (
@@ -256,9 +354,7 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
             </div>
           )}
           <p className="booking-form__summary-note">
-            {serverTotal != null
-              ? 'Final amount confirmed by the resort.'
-              : 'Estimate only. The resort confirms the final amount.'}
+            Estimate only. The resort confirms the final amount.
           </p>
         </div>
       )}
@@ -272,7 +368,7 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
       <button
         type="submit"
         className="btn btn--primary btn--block booking-form__submit"
-        disabled={!BOOKING_ENABLED || isSubmitting || overOccupancy || unavailable}
+        disabled={!CAN_SUBMIT || isSubmitting || guestsOver || unavailable || !roomId}
       >
         {isSubmitting ? 'Submitting…' : 'Request reservation'}
       </button>

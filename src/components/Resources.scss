@@ -23,9 +23,12 @@
     font-size: clamp(0.82rem, 1.1vw, 0.95rem);
   }
 
+  // Match the AboutReveal / SplitReveal headings so the home sections share one
+  // coherent heading scale (was larger here, which let titles like "Designed for
+  // Your Comfort" outgrow the column and wrap awkwardly).
   h2 {
-    font-size: clamp(2.7rem, 5.4vw, 4.75rem);
-    line-height: 1.04;
+    font-size: clamp(2.5rem, 4.8vw, 4.25rem);
+    line-height: 1.05;
   }
 }
 

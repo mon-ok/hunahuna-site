@@ -6,6 +6,10 @@
     grid-template-columns: repeat(2, minmax(160px, 220px));
   }
 }
-.rooms-grid {
-  @include card-grid(300px);
+
+// Vertical list of room-type rows (replaces the old card grid).
+.rooms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }

@@ -16,7 +16,6 @@ $color-success: #2e7d32;
 $color-error: #d64545; // standalone red so error states stay legible against blue
 
 $color-sunset: linear-gradient(135deg, #4cc3e0 0%, #1167b1 60%, #0b3d91 100%);
-$color-sunset-soft: linear-gradient(135deg, rgba(#4cc3e0, 0.92) 0%, rgba(#1167b1, 0.92) 60%, rgba(#0b3d91, 0.92) 100%);
 
 // Typography — high-contrast serif headings paired with a clean geometric
 // sans for UI/body. System fallbacks keep first paint sane.
@@ -38,18 +37,8 @@ $shadow-sm: 0 4px 18px rgba(43, 43, 43, 0.06);
 $shadow-md: 0 14px 40px rgba(43, 43, 43, 0.1);
 $shadow-lg: 0 30px 70px rgba(43, 43, 43, 0.16);
 
-// Layout — wider stage + generous gutter for an airier, editorial feel.
-$max-width: 1280px;
-$gutter: 1.5rem;
-
-// Breakpoints (mobile-first)
-$bp-sm: 640px;
-$bp-md: 900px;
-$bp-lg: 1200px;
-
 // Z-index scale
 $z-nav: 100;
-$z-overlay: 500;
 $z-lightbox: 900;
 
 // ---- Motion tokens ----------------------------------------------------------

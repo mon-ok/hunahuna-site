@@ -1,0 +1,65 @@
+.menu-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.menu-card__media {
+  position: relative;
+  overflow: hidden;
+  .img {
+    width: 100%;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+.menu-card:hover .menu-card__media .img {
+  transform: scale(1.05);
+}
+
+// Price chip floats over the photo, kiosk-style.
+.menu-card__price {
+  position: absolute;
+  bottom: 0.7rem;
+  right: 0.7rem;
+  background: rgba($color-light, 0.95);
+  backdrop-filter: blur(4px);
+  border-radius: $radius-pill;
+  padding: 0.35rem 0.8rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: $color-dark;
+  box-shadow: $shadow-sm;
+}
+.menu-card__price--market {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $color-primary;
+}
+
+.menu-card__body {
+  padding: 0.9rem 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+.menu-card__name {
+  margin: 0;
+  font-family: $font-body;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.menu-card__desc {
+  margin: 0;
+  color: $color-muted;
+  font-size: 0.88rem;
+  @include line-clamp(3);
+}

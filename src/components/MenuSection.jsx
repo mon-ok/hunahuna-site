@@ -1,44 +1,22 @@
-import Image from './Image'
-import { menuImageUrl } from '@/lib/storage'
-import { formatMoney } from '@/lib/rates'
+import MenuCard from './MenuCard'
 import './MenuSection.scss'
 
-// Renders one category's items. `items` are already filtered to is_available.
+const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
+// One category block: a heading followed by a gallery grid of its items.
 export default function MenuSection({ category, items }) {
+  const id = `cat-${slug(category)}`
   return (
-    <section className="menu-section" aria-labelledby={`cat-${category}`}>
-      <h3 id={`cat-${category}`} className="menu-section__title">
+    <section className="menu-section" aria-labelledby={id}>
+      <h3 id={id} className="menu-section__title">
         {category}
+        <span className="menu-section__count">{items.length}</span>
       </h3>
-      <ul className="menu-section__list">
+      <div className="menu-grid">
         {items.map((item) => (
-          <li key={item.id} className="menu-item">
-            {item.image_path && (
-              <Image
-                src={menuImageUrl(item.image_path)}
-                alt={item.name}
-                ratio="1 / 1"
-                className="menu-item__img"
-              />
-            )}
-            <div className="menu-item__body">
-              <div className="menu-item__head">
-                <h4 className="menu-item__name">{item.name}</h4>
-                <span className="menu-item__price">
-                  {item.is_market_price ? (
-                    <span className="badge badge--accent">Market Price</span>
-                  ) : (
-                    <span className="price">{formatMoney(item.price)}</span>
-                  )}
-                </span>
-              </div>
-              {item.description && (
-                <p className="menu-item__desc">{item.description}</p>
-              )}
-            </div>
-          </li>
+          <MenuCard key={item.id} item={item} />
         ))}
-      </ul>
+      </div>
     </section>
   )
 }
