@@ -1,4 +1,4 @@
-import { representativeRate, formatMoney } from '@/lib/rates'
+import { weekdayRate, weekendRate, formatMoney } from '@/lib/rates'
 import './RoomTypePicker.scss'
 
 // Selectable list of room *types* (no per-room redundancy). Each option shows
@@ -8,7 +8,8 @@ export default function RoomTypePicker({ groups = [], value, onSelect }) {
     <div className="room-picker" role="radiogroup" aria-label="Room or cottage">
       {groups.map((g) => {
         const selected = g.type === value
-        const rate = representativeRate(g.representative)
+        const weekday = weekdayRate(g.representative)
+        const weekend = weekendRate(g.representative)
         return (
           <button
             type="button"
@@ -20,10 +21,26 @@ export default function RoomTypePicker({ groups = [], value, onSelect }) {
           >
             <span className="room-picker__head">
               <span className="room-picker__name">{g.type}</span>
-              {rate != null && (
-                <span className="room-picker__rate">
-                  from <span className="price">{formatMoney(rate)}</span>
-                  <small>/night</small>
+              {(weekday != null || weekend != null) && (
+                <span className="room-picker__rates">
+                  {weekday != null && (
+                    <span className="room-picker__rate">
+                      <span className="room-picker__rate-label">Weekday</span>
+                      <span className="room-picker__rate-value">
+                        <span className="price">{formatMoney(weekday)}</span>
+                        <small>/night</small>
+                      </span>
+                    </span>
+                  )}
+                  {weekend != null && (
+                    <span className="room-picker__rate">
+                      <span className="room-picker__rate-label">Weekend</span>
+                      <span className="room-picker__rate-value">
+                        <span className="price">{formatMoney(weekend)}</span>
+                        <small>/night</small>
+                      </span>
+                    </span>
+                  )}
                 </span>
               )}
             </span>
