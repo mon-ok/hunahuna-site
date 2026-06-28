@@ -55,7 +55,7 @@ export default function Contact() {
             </ul>
 
             <h3>Front desk hours</h3>
-            <p className="contact__hours">Daily, 7:00 AM – 10:00 PM</p>
+            <p className="contact__hours">Daily, 8:00 AM – 8:00 PM</p>
 
             <h3>Follow along</h3>
             <ul className="contact__socials">

@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from 'framer-motion'
+import { useRef } from 'react'
+import { motion, useReducedMotion, useInView } from 'framer-motion'
 
 // ---------------------------------------------------------------------------
 // Shared motion primitives. Every animation here is transform/opacity only so
@@ -12,6 +13,13 @@ import { motion, useReducedMotion } from 'framer-motion'
 // up doesn't re-animate (which reads as janky on long pages). The bottom margin
 // shrinks the trigger zone up from the bottom of the screen.
 const VIEWPORT = { once: true, amount: 0.3, margin: '0px 0px -25% 0px' }
+
+// A Stagger wraps a whole *group* that can be far taller than the viewport (the
+// gallery grid is the extreme case). Reusing VIEWPORT here would demand 30% of
+// the entire container be on screen at once — impossible for a long grid, which
+// strands every child at opacity 0 (a tall column of white boxes). Trigger as
+// soon as the group's top edge enters instead; the children then cascade in.
+const GROUP_VIEWPORT = { once: true, amount: 'some', margin: '0px 0px -10% 0px' }
 
 const EASE = [0.22, 1, 0.36, 1] // gentle "ease-out-expo"-ish curve
 
@@ -44,6 +52,13 @@ export function Reveal({
   ...rest
 }) {
   const reduce = useReducedMotion()
+  const ref = useRef(null)
+  // Drive the reveal off a ref-bound observer rather than the declarative
+  // `whileInView`: the latter can get stuck at opacity 0 when the element
+  // mounts mid route-transition (async data + AnimatePresence + scroll reset),
+  // because its one-shot in-view reading races with layout settling. `useInView`
+  // re-evaluates against the settled ref, so the reveal can't strand itself.
+  const inView = useInView(ref, VIEWPORT)
   const Tag = motion[as] ?? motion.div
 
   if (reduce) {
@@ -57,18 +72,16 @@ export function Reveal({
 
   const hidden = { opacity: 0, x, y }
   const shown = { opacity: 1, x: 0, y: 0 }
-  // Controlled (caller passes `active`) vs self-triggering (whileInView).
-  const trigger =
-    active === undefined
-      ? { whileInView: shown, viewport: VIEWPORT }
-      : { animate: active ? shown : hidden }
+  // Controlled (caller passes `active`) vs self-triggering (in-view).
+  const isShown = active === undefined ? inView : active
 
   return (
     <Tag
+      ref={ref}
       className={className}
       initial={hidden}
+      animate={isShown ? shown : hidden}
       transition={{ duration, ease: EASE, delay }}
-      {...trigger}
       {...rest}
     >
       {children}
@@ -87,14 +100,16 @@ export function Stagger({
   ...rest
 }) {
   const reduce = useReducedMotion()
+  const ref = useRef(null)
+  const inView = useInView(ref, GROUP_VIEWPORT)
   const Tag = motion[as] ?? motion.div
 
   return (
     <Tag
+      ref={ref}
       className={className}
       initial={reduce ? false : 'hidden'}
-      whileInView={reduce ? undefined : 'show'}
-      viewport={VIEWPORT}
+      animate={reduce ? undefined : inView ? 'show' : 'hidden'}
       variants={{
         hidden: {},
         show: { transition: { staggerChildren: gap } },
@@ -148,6 +163,8 @@ export function RevealHeading({
   ...rest
 }) {
   const reduce = useReducedMotion()
+  const ref = useRef(null)
+  const inView = useInView(ref, VIEWPORT)
   const Tag = motion[as] ?? motion.h2
 
   if (reduce) {
@@ -159,10 +176,8 @@ export function RevealHeading({
     )
   }
 
-  const trigger =
-    active === undefined
-      ? { whileInView: 'show', viewport: VIEWPORT }
-      : { animate: active ? 'show' : 'hidden' }
+  const animateState =
+    (active === undefined ? inView : active) ? 'show' : 'hidden'
 
   // Word mode: split into words while preserving the spaces between them. Each
   // word rises up from further below and fades in — a chunkier, more deliberate
@@ -171,11 +186,12 @@ export function RevealHeading({
     const parts = text.split(/(\s+)/) // keeps the whitespace tokens
     return (
       <Tag
+        ref={ref}
         className={className}
         aria-label={text}
         initial="hidden"
+        animate={animateState}
         variants={{ hidden: {}, show: { transition: { staggerChildren: stagger } } }}
-        {...trigger}
         {...rest}
       >
         {parts.map((part, i) =>
@@ -210,11 +226,12 @@ export function RevealHeading({
   let letterIndex = 0
   return (
     <Tag
+      ref={ref}
       className={className}
       aria-label={text}
       initial="hidden"
+      animate={animateState}
       variants={{ hidden: {}, show: {} }}
-      {...trigger}
       {...rest}
     >
       {segments.map((seg, s) =>

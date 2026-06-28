@@ -77,7 +77,7 @@ export default function App() {
             exit={{ opacity: 0 }}
             transition={{ duration: reduce || phase !== 'idle' ? 0 : 0.3, ease: 'easeOut' }}
           >
-            <Suspense fallback={<Loader label="Loading…" />}>
+            <Suspense fallback={<div className="app__loading"><Loader label="Loading…" /></div>}>
               <Routes location={displayLocation}>
                 <Route path="/" element={<Home />} />
                 <Route path="/rooms" element={<Rooms />} />
