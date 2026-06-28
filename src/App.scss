@@ -5,6 +5,19 @@
 }
 .app__main {
   flex: 1;
+  // Keep the content area at least a full viewport tall. During a route swap
+  // (AnimatePresence mode="wait") and while a lazy page chunk is still resolving
+  // in Suspense, the page momentarily has little/no content; without this the
+  // footer rides up into view and flashes before the new page paints.
+  min-height: 100vh;
+}
+
+// Full-height, centred holder for the route-level Suspense fallback so the
+// spinner sits mid-screen and the layout doesn't jump as the page resolves.
+.app__loading {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
 }
 
 // The navbar is fixed, so pages whose first block isn't a full-bleed hero or
