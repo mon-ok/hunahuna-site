@@ -30,6 +30,19 @@ export function representativeRate(room) {
   return Math.min(...tiers.map(Number))
 }
 
+// Display rate for a single tier, with the same fallback chain the server uses
+// in calculate_booking_rate (weekday -> base; weekend -> weekday -> base).
+// Returns null when no rate is defined at all.
+export function weekdayRate(room) {
+  const v = room?.weekday_rate ?? room?.base_rate
+  return v == null ? null : Number(v)
+}
+
+export function weekendRate(room) {
+  const v = room?.weekend_rate ?? room?.weekday_rate ?? room?.base_rate
+  return v == null ? null : Number(v)
+}
+
 function isWeekendNight(date) {
   const d = date.getDay() // 0 Sun … 6 Sat
   return d === 5 || d === 6 // Fri or Sat

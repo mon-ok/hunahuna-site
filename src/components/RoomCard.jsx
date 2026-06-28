@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import Image from './Image'
 import { roomImageUrl } from '@/lib/storage'
-import { representativeRate, formatMoney } from '@/lib/rates'
+import { weekdayRate, weekendRate, formatMoney } from '@/lib/rates'
 import './RoomCard.scss'
 
 // A `group` represents one room_type (e.g. all six "Cliff Side Room"s). Rooms
@@ -14,7 +14,8 @@ function groupImage(group) {
 
 export default function RoomCard({ group }) {
   const img = groupImage(group)
-  const rate = representativeRate(group.representative)
+  const weekday = weekdayRate(group.representative)
+  const weekend = weekendRate(group.representative)
   const detailHref = `/rooms/${group.representative.id}`
   const bookingHref = `/booking?room=${group.representative.id}`
   const countLabel = group.count === 1 ? '1 room' : `${group.count} rooms`
@@ -59,11 +60,27 @@ export default function RoomCard({ group }) {
         )}
 
         <div className="room-card__footer">
-          {rate != null && (
-            <span className="room-card__rate">
-              from <span className="price">{formatMoney(rate)}</span>
-              <small>/night</small>
-            </span>
+          {(weekday != null || weekend != null) && (
+            <div className="room-card__rates">
+              {weekday != null && (
+                <span className="room-card__rate">
+                  <span className="room-card__rate-label">Weekday</span>
+                  <span className="room-card__rate-value">
+                    <span className="price">{formatMoney(weekday)}</span>
+                    <small>/night</small>
+                  </span>
+                </span>
+              )}
+              {weekend != null && (
+                <span className="room-card__rate">
+                  <span className="room-card__rate-label">Weekend</span>
+                  <span className="room-card__rate-value">
+                    <span className="price">{formatMoney(weekend)}</span>
+                    <small>/night</small>
+                  </span>
+                </span>
+              )}
+            </div>
           )}
           <div className="room-card__actions">
             <Link to={detailHref} className="btn btn--outline">
