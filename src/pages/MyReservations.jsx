@@ -12,6 +12,13 @@ const STATUS_LABEL = {
   rescheduled: 'Rescheduled',
 }
 
+const PAYMENT_LABEL = {
+  none: 'Awaiting deposit',
+  partial: 'Deposit paid',
+  paid: 'Paid in full',
+  refunded: 'Refunded',
+}
+
 export default function MyReservations() {
   const lookup = useReservationLookup()
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -20,6 +27,9 @@ export default function MyReservations() {
 
   const onSubmit = (v) => lookup.mutate(v)
   const booking = lookup.data
+  const paid = booking?.amount_paid ?? 0
+  const balance =
+    booking?.total_amount != null ? Math.max(booking.total_amount - paid, 0) : null
 
   return (
     <>
@@ -68,8 +78,19 @@ export default function MyReservations() {
                 {booking.total_amount != null && (
                   <><dt>Total</dt><dd className="price">{formatMoney(booking.total_amount)}</dd></>
                 )}
+                {paid > 0 && (
+                  <><dt>Deposit paid</dt><dd className="price">{formatMoney(paid)}</dd></>
+                )}
+                {paid > 0 && balance != null && (
+                  <><dt>Due at resort</dt><dd className="price">{formatMoney(balance)}</dd></>
+                )}
                 {booking.payment_status && (
-                  <><dt>Payment</dt><dd className="reservations__pay">{booking.payment_status}</dd></>
+                  <>
+                    <dt>Payment</dt>
+                    <dd className="reservations__pay">
+                      {PAYMENT_LABEL[booking.payment_status] ?? booking.payment_status}
+                    </dd>
+                  </>
                 )}
               </dl>
             </div>

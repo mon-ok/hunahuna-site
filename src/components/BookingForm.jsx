@@ -2,7 +2,9 @@ import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { useCreateBooking } from '@/hooks/useCreateBooking'
+import { useCheckoutSession } from '@/hooks/useCheckout'
 import { useRoomBookings } from '@/hooks/useRoomBookings'
+import { savePendingPayment } from '@/lib/pendingPayment'
 import RoomTypePicker from '@/components/RoomTypePicker'
 import BookingCalendar from '@/components/BookingCalendar'
 import {
@@ -59,6 +61,7 @@ function formatNice(dStr) {
 export default function BookingForm({ rooms = [], preselectedRoomId }) {
   const navigate = useNavigate()
   const createBooking = useCreateBooking()
+  const checkout = useCheckoutSession()
   const { data: bookings = [] } = useRoomBookings()
 
   const groups = useMemo(() => groupByType(rooms), [rooms])
@@ -168,8 +171,9 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
       return
     }
 
+    let result
     try {
-      const result = await createBooking.mutateAsync({
+      result = await createBooking.mutateAsync({
         fullName: values.fullName,
         email: values.email,
         phone: values.phone,
@@ -180,12 +184,45 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
         promoCode: values.promoCode,
         notes: values.notes,
       })
-      navigate('/booking/confirmed', {
-        state: { booking: result, roomType: group?.type },
-      })
     } catch {
-      // Error surfaced below via createBooking.error
+      return // createBooking.error surfaced below
     }
+
+    // With live booking enabled, the booking is created as `pending` with a
+    // 30-min hold; the guest must pay the deposit to confirm it. Hand off to
+    // PayMongo and let the webhook be the source of truth for "paid".
+    if (BOOKING_ENABLED) {
+      // Stash the email so the PayMongo return page (which only gets ?ref) can
+      // look the booking up. Persisted BEFORE the redirect so it survives leaving the app.
+      savePendingPayment({
+        ref: result.booking_ref,
+        email: values.email,
+        roomType: group?.type,
+        total: result.total_amount,
+      })
+      try {
+        const checkoutUrl = await checkout.mutateAsync({
+          bookingRef: result.booking_ref,
+          email: values.email,
+        })
+        window.location.assign(checkoutUrl)
+        return // leaving the app for PayMongo
+      } catch {
+        // The booking exists (pending, hold live) but we couldn't start payment.
+        // Send them to the confirmation page to retry — re-submitting the form
+        // would collide with their own just-created pending booking.
+        navigate('/booking/confirmed', {
+          state: { booking: result, roomType: group?.type, needsPayment: true },
+        })
+        return
+      }
+    }
+
+    // Non-payment fallback (shouldn't normally run, since the real path only
+    // executes when BOOKING_ENABLED is true).
+    navigate('/booking/confirmed', {
+      state: { booking: result, roomType: group?.type },
+    })
   }
 
   return (
@@ -359,9 +396,11 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
         </div>
       )}
 
-      {createBooking.isError && (
+      {(createBooking.isError || checkout.isError) && (
         <p className="field__error" role="alert">
-          {createBooking.error?.message || 'Booking failed. Please try again.'}
+          {createBooking.error?.message ||
+            checkout.error?.message ||
+            'Booking failed. Please try again.'}
         </p>
       )}
 
@@ -370,12 +409,24 @@ export default function BookingForm({ rooms = [], preselectedRoomId }) {
         className="btn btn--primary btn--block booking-form__submit"
         disabled={!CAN_SUBMIT || isSubmitting || guestsOver || unavailable || !roomId}
       >
-        {isSubmitting ? 'Submitting…' : 'Request reservation'}
+        {isSubmitting
+          ? BOOKING_ENABLED ? 'Starting payment…' : 'Submitting…'
+          : BOOKING_ENABLED ? 'Continue to payment' : 'Request reservation'}
       </button>
 
       <p className="booking-form__fineprint">
-        Reservations are created as <strong>pending</strong>. The resort confirms
-        availability and payment before your stay.
+        {BOOKING_ENABLED ? (
+          <>
+            Your dates are held for <strong>30 minutes</strong> while you pay a{' '}
+            <strong>50% deposit</strong> to confirm. The balance is settled at the
+            resort on arrival.
+          </>
+        ) : (
+          <>
+            Reservations are created as <strong>pending</strong>. The resort
+            confirms availability and payment before your stay.
+          </>
+        )}
       </p>
     </form>
   )
